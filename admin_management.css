@@ -1,0 +1,62 @@
+/* CivicFix Phase 4 Part 7 — local audit log & settings. Uses admin.css shell. */
+.manage-content { padding-top:36px; }
+.manage-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:28px; }
+.manage-heading h2 { font-size:25px; letter-spacing:-.9px; margin:3px 0 9px; }
+.manage-heading p { margin:0; color:#7b8fab; font-size:13px; line-height:1.65; }
+.manage-eyebrow { color:#577cc7!important; font-size:10px!important; font-weight:800; letter-spacing:1.7px; }
+.manage-subtitle { flex:0 0 auto; font-size:11px; font-weight:750; color:#6582b9; background:#eef3ff; border-radius:50px; padding:11px 14px; }
+.manage-card { border:1px solid #e4eaf5; background:#fff; border-radius:20px; box-shadow:0 11px 30px rgba(27,49,102,.05); overflow:hidden; min-width:0; }
+.manage-card-header { padding:25px 26px; display:flex; justify-content:space-between; align-items:center; gap:18px; border-bottom:1px solid #eef2f8; }
+.manage-card-header h3, .settings-account-info h3 { font-size:18px; font-weight:800; letter-spacing:-.45px; margin:0 0 7px; }
+.manage-card-header p, .settings-account-info p { font-size:12px; color:#90a0bb; margin:0; line-height:1.65; }
+.manage-filters { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.manage-filters input,.manage-filters select,.settings-form input { border:1px solid #dce5f3; border-radius:11px; min-height:44px; font:inherit; font-size:12px; color:#293c5d; padding:11px 13px; background:#fff; outline:0; }
+.manage-filters input { width:min(260px, 100%); }
+.manage-filters input:focus,.manage-filters select:focus,.settings-form input:focus { border-color:#4678ef; box-shadow:0 0 0 3px rgba(60,105,240,.09); }
+.manage-action { display:inline-flex; justify-content:center; align-items:center; border:0; background:linear-gradient(112deg,#5147dc,#246ae9); color:#fff; min-height:44px; padding:10px 20px; border-radius:11px; font-size:12px; font-weight:800; cursor:pointer; }
+.manage-action:hover { filter:brightness(1.06); }
+.manage-action.secondary { border:1px solid #dce5f3; background:#fff; color:#41587b; }
+.audit-row { display:flex; align-items:flex-start; gap:17px; padding:20px 26px; border-bottom:1px solid #f0f2f8; }
+.audit-row:last-child { border-bottom:0; }
+.audit-symbol { height:40px; width:40px; display:grid; place-items:center; flex:0 0 40px; color:#2963e5; border-radius:12px; background:#edf3ff; }
+.audit-symbol .icon { height:20px; width:20px; }
+.audit-team { color:#008e7b; background:#e7faf4; }
+.audit-account { color:#864ce8; background:#f5efff; }
+.audit-body { flex:1; min-width:0; }
+.audit-title { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.audit-title strong { color:#14203b; font-size:13px; }
+.audit-badge { font-size:10px; border-radius:100px; padding:5px 9px; color:#5b73aa; font-weight:750; background:#f0f4fb; }
+.audit-target { font-size:12px; color:#7a8daa; margin:9px 0 7px; }
+.audit-target a { font-weight:750; color:#3167e9; }
+.audit-detail { font-size:12px; line-height:1.6; margin:0; color:#51627e; overflow-wrap:anywhere; }
+.audit-time { font-size:11px; font-weight:700; text-align:right; color:#627695; white-space:nowrap; }
+.audit-time span { color:#9daac0; font-weight:500; margin-top:6px; display:block; }
+.manage-pagination { display:flex; justify-content:center; gap:25px; padding:23px; font-size:12px; color:#7788a4; }
+.manage-pagination a { font-weight:800; color:#315fdf; }
+.manage-empty { text-align:center; padding:70px 25px; color:#9cabc0; }
+.manage-empty .icon { width:33px; height:33px; color:#85a2dd; }
+.manage-empty h3 { color:#334867; font-size:16px; margin:17px 0 8px; }
+.manage-empty p { font-size:12px; line-height:1.7; max-width:430px; margin:0 auto 20px; }
+.manage-footnote { color:#8394ad; font-size:11px; line-height:1.7; margin:18px 6px; }
+.settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start; }
+.settings-icon { display:grid; place-items:center; border-radius:12px; background:#edf3ff; color:#416feb; height:43px; width:43px; flex:0 0 auto; }
+.settings-icon.violet { background:#f4efff; color:#7e45e7; }
+.settings-form { display:flex; flex-direction:column; gap:9px; padding:24px 26px 28px; }
+.settings-form label { margin-top:9px; color:#3e5171; font-size:12px; font-weight:750; }
+.settings-form label small { color:#9cabbe; font-weight:500; margin-left:3px; }
+.settings-form input { width:100%; font-size:13px; }
+.settings-form .manage-action { align-self:flex-start; margin-top:17px; }
+.settings-help { font-size:11px; color:#8395b0; line-height:1.65; margin:11px 0 0; }
+.settings-account-info { margin-top:22px; padding:25px 27px; }
+.account-meta { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:21px; }
+.account-meta > div { padding:18px; background:#f7f9fe; border:1px solid #edf1f8; border-radius:12px; }
+.account-meta span { color:#8a9bb5; font-size:11px; display:block; margin-bottom:9px; }
+.account-meta strong { font-size:14px; color:#253653; }
+.sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+@media(max-width:1120px){.settings-grid{grid-template-columns:1fr}.manage-card-header{align-items:flex-start;flex-direction:column}}
+@media(max-width:650px){.manage-content{padding:25px 17px}.manage-heading{flex-direction:column}.manage-card-header{padding:20px}.manage-filters{width:100%}.manage-filters input{width:100%}.audit-row{padding:17px;gap:10px}.audit-time{font-size:10px}.account-meta{grid-template-columns:1fr}.settings-form{padding:20px}.manage-subtitle{align-self:flex-start}}
+
+/* Keep the management links visible in the compact/mobile sidebar. */
+@media (max-width:800px) {
+  .admin-sidebar .sidebar-nav + .sidebar-label + .sidebar-nav { display:flex; }
+}

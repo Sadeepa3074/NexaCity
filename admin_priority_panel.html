@@ -1,0 +1,77 @@
+{% set priority = civicfix_priority(report) %}
+<section class="cf-priority-panel" aria-label="Priority recommendation">
+  <header class="cf-priority-heading">
+    <div>
+      <span class="cf-priority-overline">ADMINISTRATOR REVIEW</span>
+      <h3>Priority recommendation</h3>
+    </div>
+    <span class="cf-priority-manual-tag">Officer decides</span>
+  </header>
+  <p class="cf-priority-intro">Suggested priority considers the reported severity, description, report age and reviewed similar reports. <strong>An administrator confirms the final priority; this is not an emergency risk assessment.</strong></p>
+  {% if priority.state == 'database_unavailable' %}
+    <p class="cf-priority-empty">Priority review records are currently unavailable. Please try again later or contact the system administrator.</p>
+  {% else %}
+    {% set suggestion = priority.recommendation %}
+    {% if suggestion.state == 'closed' %}
+      <p class="cf-priority-empty"><strong>Report already {{ report.status | lower }}.</strong> Closed complaints are excluded from the active priority queue. Any earlier officer review is displayed for reference below.</p>
+    {% else %}
+      <div class="cf-priority-summary">
+        <div>
+          <span class="cf-priority-label">Suggested priority</span>
+          <strong class="cf-priority-level is-{{ suggestion.level | lower }}">{{ suggestion.level }}</strong>
+        </div>
+        <div class="cf-priority-score-block">
+          <span class="cf-priority-label">Indicative rule score</span>
+          <strong>{{ suggestion.score }}<small> / 100</small></strong>
+        </div>
+      </div>
+      <progress class="cf-priority-meter" max="100" value="{{ suggestion.score }}" aria-label="Indicative priority score">{{ suggestion.score }} / 100</progress>
+      <h4 class="cf-priority-breakdown-title">Why this score?</h4>
+      <div class="cf-priority-breakdown">
+        {% for item in suggestion.components %}
+        <div class="cf-priority-factor">
+          <div><strong>{{ item.label }}</strong><small>{{ item.basis }}</small></div>
+          <span>+{{ item.points }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% if suggestion.capped %}
+        <p class="cf-priority-disclaimer">The uncapped points exceeded 100; the display is limited to 100.</p>
+      {% endif %}
+      <p class="cf-priority-disclaimer">This recommendation is based on the information provided and does not independently verify a hazard or location. For immediate danger, follow the appropriate emergency procedures.</p>
+    {% endif %}
+
+    <div class="cf-priority-officer">
+      <h4>Officer-confirmed priority</h4>
+      {% if priority.review %}
+        <div class="cf-priority-review">
+          <span>Current officer assessment</span>
+          <strong class="cf-priority-level is-{{ priority.review.decision | lower }}">{{ priority.review.decision }}</strong>
+          <p>{{ priority.review.note }}</p>
+          <small>Confirmed by {{ priority.review.officer_name }} · {{ priority.review.reviewed_at.strftime('%d %b %Y · %I:%M %p') }}</small>
+          <small>Rule suggestion at review: {{ priority.review.recommended_level }} ({{ priority.review.score_at_review }}/100, {{ priority.review.scoring_version }})</small>
+        </div>
+      {% else %}
+        <p class="cf-priority-disclaimer">This report has not yet received an administrator priority assessment.</p>
+      {% endif %}
+      {% if suggestion.state == 'ready' %}
+        <form class="cf-priority-form" method="POST" data-cf-async-form
+              action="{{ url_for('admin.review_priority', complaint_id=report.complaint_id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <label for="cf-priority-decision-{{ report.complaint_id }}">Select final officer priority</label>
+          <select id="cf-priority-decision-{{ report.complaint_id }}" name="decision" required>
+            <option value="">Choose a priority</option>
+            {% for level in ('Low', 'Moderate', 'High', 'Critical') %}
+              <option value="{{ level }}" {% if priority.review and priority.review.decision == level %}selected{% endif %}>{{ level }}</option>
+            {% endfor %}
+          </select>
+          <label for="cf-priority-note-{{ report.complaint_id }}">Review reason (visible to administrators)</label>
+          <textarea id="cf-priority-note-{{ report.complaint_id }}" name="note" minlength="5" maxlength="500" rows="3" required
+             placeholder="Explain what you checked before choosing a priority (5–500 characters)">{% if priority.review %}{{ priority.review.note }}{% endif %}</textarea>
+          <button type="submit">{{ 'Update officer priority' if priority.review else 'Save officer priority' }}</button>
+        </form>
+      {% endif %}
+    </div>
+  {% endif %}
+  <p class="cf-priority-bottom">Your decision is recorded for audit purposes. It does <strong>not</strong> change the citizen's reported severity or complaint status, assign a team, or send notifications.</p>
+</section>

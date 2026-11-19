@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Login | NexaCity</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+          <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/civicfix_palette.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nexacity_premium.css') }}">
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="logo">
+        <img class="legacy-brand-symbol" src="{{ url_for('static', filename='images/nexacity-symbol-transparent.png') }}" alt="">
+        Nexa<span>City</span>
+    </div>
+
+    <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+    </nav>
+</header>
+
+<main class="auth-section">
+
+    <div class="auth-card">
+
+        <div class="auth-heading">
+            <p class="eyebrow">MUNICIPAL ADMINISTRATION</p>
+            <h1>Administrator Sign In</h1>
+            <p>
+                Secure access for authorized
+                NexaCity administrators.
+            </p>
+        </div>
+
+        {% with messages = get_flashed_messages(
+            with_categories=true
+        ) %}
+            {% for category, message in messages %}
+                <div class="notice {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST"
+              action="{{ url_for('admin.login') }}">
+
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label for="email">Admin Email</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    autocomplete="username"
+                    placeholder="Enter your admin email"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                    required>
+            </div>
+
+            <button type="submit" class="auth-btn">
+                Sign In to Admin Portal
+            </button>
+
+        </form>
+
+        <p class="auth-footer">
+            For authorized municipal personnel only.
+        </p>
+
+    </div>
+
+</main>
+
+</body>
+</html>

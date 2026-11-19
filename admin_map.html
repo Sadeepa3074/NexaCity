@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map & Hotspots | NexaCity</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_drawer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_map.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_management.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/civicfix_palette.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nexacity_premium.css') }}">
+</head>
+<body>
+<!-- Small, local SVG icon set; no icon framework required. -->
+<svg aria-hidden="true" class="svg-definitions" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v6h5M9 13h7M9 17h7"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15m6-12v15"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V11m5 9V5m5 15v-8m5 8V8M2 21h20"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 20v-2a7 7 0 0 1 14 0v2M17 5a3 3 0 0 1 0 6m1 3a5 5 0 0 1 4 5v1"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="18" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="m8 13 2 2 5-5M8 18h8"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 20 6v6c0 5-3 8-8 10-5-2-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 4H5v16h4m6-4 4-4-4-4m-9 4h13"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m12 3 10 18H2zM12 9v5m0 3v.2"/></symbol>
+</svg>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="brand-row">
+      <div class="brand-mark"><img src="{{ url_for('static', filename='images/nexacity-symbol-transparent.png') }}" alt="" aria-hidden="true"></div>
+      <div><div class="brand-title">NexaCity</div><div class="brand-subtitle">MUNICIPAL SERVICES</div></div>
+    </div>
+
+    <div class="workspace-note">
+      <svg class="icon"><use href="#i-shield"></use></svg>
+      <div><strong>Authority workspace</strong><span>Administration workspace · Report management</span></div>
+    </div>
+
+    <div class="sidebar-label">WORKSPACE</div>
+    <nav class="sidebar-nav" aria-label="Administration navigation">
+      <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+        <svg class="icon"><use href="#i-grid"></use></svg>Overview
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.reports') }}">
+        <svg class="icon"><use href="#i-file"></use></svg>Reports
+      </a>
+      <a class="nav-link active" href="{{ url_for('admin.map_hotspots') }}" aria-current="page">
+        <svg class="icon"><use href="#i-map"></use></svg>Map &amp; hotspots
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.analytics') }}">
+        <svg class="icon"><use href="#i-chart"></use></svg>Analytics
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.teams') }}">
+        <svg class="icon"><use href="#i-users"></use></svg>Teams
+      </a>
+    </nav>
+
+    <div class="sidebar-label manage-label">MANAGE</div>
+    <nav class="sidebar-nav" aria-label="Administration tools">
+      <a class="nav-link" href="{{ url_for('admin.audit_log') }}">
+        <svg class="icon"><use href="#i-clipboard"></use></svg>Audit log
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.settings') }}">
+        <svg class="icon"><use href="#i-settings"></use></svg>Settings
+      </a>
+    </nav>
+    <div class="sidebar-bottom">
+      <form action="{{ url_for('admin.logout') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="sidebar-logout"><svg class="icon"><use href="#i-logout"></use></svg>Sign out</button>
+      </form>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-heading"><h1>Map &amp; hotspots</h1><p>Explore real citizen report locations and concentrations.</p></div>
+      <div class="topbar-actions">
+        <a class="citizen-button" href="{{ url_for('home') }}">Public website <svg class="icon"><use href="#i-arrow"></use></svg></a>
+        <span class="admin-avatar" aria-label="Signed in as {{ user.full_name }}">{{ user.full_name[:2] | upper }}</span>
+      </div>
+    </header>
+
+    <main class="admin-content map-page-content">
+      <section class="map-page-head">
+        <div>
+          <p class="map-page-eyebrow">COLOMBO SERVICE AREA · REPORT LOCATIONS</p>
+          <h2>Explore issue locations</h2>
+          <p>Explore citizen-selected report locations on the interactive map. Concentrations show report counts, not confirmed incident severity.</p>
+        </div>
+        <span class="map-live-tag">● LIVE REPORTS</span>
+      </section>
+
+      <section class="map-summary-cards" aria-label="Map statistics">
+        <article><strong>{{ totals.report_count }}</strong><span>Matching mapped reports</span></article>
+        <article><strong>{{ totals.high_count }}</strong><span>Citizen-rated high severity</span></article>
+        <article><strong>{{ totals.submitted_count }}</strong><span>Awaiting first review</span></article>
+        <article><strong>{{ hotspot_areas | length }}</strong><span>Leading areas listed</span></article>
+      </section>
+
+      <div class="map-page-layout">
+        <section class="panel map-filter-panel" aria-labelledby="map-filter-heading">
+          <div class="map-filter-header">
+            <h2 id="map-filter-heading">Map &amp; hotspots</h2>
+            <p>Filter and explore spatial report patterns.</p>
+          </div>
+          <form method="GET" action="{{ url_for('admin.map_hotspots') }}" class="map-filter-form">
+            <label for="area-search">Search an area or landmark</label>
+            <input id="area-search" name="area" value="{{ area_query }}" type="search" maxlength="80" placeholder="e.g. Colombo or Main Road">
+            <label for="category-select">Issue category</label>
+            <select id="category-select" name="category">
+              <option value="all">All categories</option>
+              {% for cat in categories %}
+              <option value="{{ cat.category_id }}" {% if chosen_category == cat.category_id %}selected{% endif %}>{{ cat.category_name }}</option>
+              {% endfor %}
+            </select>
+            <label for="status-select">Complaint status</label>
+            <select id="status-select" name="status">
+              <option value="open" {% if status_filter == 'open' %}selected{% endif %}>Open reports only</option>
+              <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All statuses</option>
+              <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>Resolved only</option>
+            </select>
+            <div class="map-form-actions">
+              <button type="submit" class="map-filter-submit">Apply filters</button>
+              <a href="{{ url_for('admin.map_hotspots') }}" class="map-filter-reset">Reset</a>
+            </div>
+          </form>
+          <div class="map-hotspot-list-head">
+            <h3>Highest concentration</h3>
+            <span>By reported area</span>
+          </div>
+          {% if hotspot_areas %}
+          <div class="map-area-list" id="map-area-list">
+            {% for hotspot in hotspot_areas %}
+            <button class="map-area-item" type="button"
+                    data-lat="{{ hotspot.lat }}" data-lng="{{ hotspot.lng }}"
+                    data-name="{{ hotspot.area }}" aria-label="Focus map on {{ hotspot.area }}">
+              <span class="map-area-dot" aria-hidden="true"></span>
+              <span class="map-area-label"><strong>{{ hotspot.area }}</strong><small>Focus map on area</small></span>
+              <span class="map-area-count">{{ hotspot.count }}</span>
+            </button>
+            {% endfor %}
+          </div>
+          {% else %}
+            <div class="map-area-empty">No matching locations yet. Try another filter or explore a different area.</div>
+          {% endif %}
+          <p class="map-area-note">Counts are individual citizen reports; multiple reports may describe the same incident.</p>
+        </section>
+
+        <section class="panel map-visual-panel" aria-labelledby="map-visual-heading">
+          <div class="map-visual-header">
+            <div><h2 id="map-visual-heading">Live complaint map</h2><p>Click a marker to inspect its report.</p></div>
+            <div class="map-view-toggle" role="group" aria-label="Map visualization">
+              <button type="button" class="map-mode-button active" data-map-mode="clusters" aria-pressed="true">Concentrations</button>
+              <button type="button" class="map-mode-button" data-map-mode="pins" aria-pressed="false">Report pins</button>
+            </div>
+          </div>
+          <div id="admin-hotspots-map" role="region" aria-label="Interactive map of complaint locations"></div>
+          <div id="map-feedback" class="map-status-message" role="status" aria-live="polite">
+            {% if totals.report_count == 0 %}No reports match your filters. The map is centered on Colombo.{% elif totals.report_count > (map_points | length) %}Showing the most recent {{ map_points | length }} of {{ totals.report_count }} matching mapped reports.{% else %}{{ totals.report_count }} matching reports. Use the controls above to explore.{% endif %}
+          </div>
+          <div class="map-legend-row"><span><i class="map-severity-dot low"></i> Low</span><span><i class="map-severity-dot medium"></i> Medium</span><span><i class="map-severity-dot high"></i> High</span><span class="map-legend-caption">Pin colors = citizen-reported severity</span></div>
+        </section>
+      </div>
+      <p class="map-page-disclaimer">Map points show locations selected by citizens. Counts are descriptive report totals and do not represent verified hazards or predicted risk.</p>
+    </main>
+  </div>
+</div>
+<script id="civicfix-hotspots-data" type="application/json">{{ map_points | tojson }}</script>
+{% include 'admin_drawer_shell.html' %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{{ url_for('static', filename='js/admin_map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin_drawer.js') }}"></script>
+</body>
+</html>

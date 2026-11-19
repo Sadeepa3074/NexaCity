@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit log | NexaCity</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_drawer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_management.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/civicfix_palette.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nexacity_premium.css') }}">
+</head>
+<body>
+<!-- Small, local SVG icon set; no icon framework required. -->
+<svg aria-hidden="true" class="svg-definitions" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v6h5M9 13h7M9 17h7"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15m6-12v15"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V11m5 9V5m5 15v-8m5 8V8M2 21h20"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 20v-2a7 7 0 0 1 14 0v2M17 5a3 3 0 0 1 0 6m1 3a5 5 0 0 1 4 5v1"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="18" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="m8 13 2 2 5-5M8 18h8"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 20 6v6c0 5-3 8-8 10-5-2-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 4H5v16h4m6-4 4-4-4-4m-9 4h13"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m12 3 10 18H2zM12 9v5m0 3v.2"/></symbol>
+</svg>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="brand-row">
+      <div class="brand-mark"><img src="{{ url_for('static', filename='images/nexacity-symbol-transparent.png') }}" alt="" aria-hidden="true"></div>
+      <div><div class="brand-title">NexaCity</div><div class="brand-subtitle">MUNICIPAL SERVICES</div></div>
+    </div>
+
+    <div class="workspace-note">
+      <svg class="icon"><use href="#i-shield"></use></svg>
+      <div><strong>Authority workspace</strong><span>Administration workspace · Report management</span></div>
+    </div>
+
+    <div class="sidebar-label">WORKSPACE</div>
+    <nav class="sidebar-nav" aria-label="Administration navigation">
+      <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+        <svg class="icon"><use href="#i-grid"></use></svg>Overview
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.reports') }}">
+        <svg class="icon"><use href="#i-file"></use></svg>Reports
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.map_hotspots') }}">
+        <svg class="icon"><use href="#i-map"></use></svg>Map &amp; hotspots
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.analytics') }}">
+        <svg class="icon"><use href="#i-chart"></use></svg>Analytics
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.teams') }}">
+        <svg class="icon"><use href="#i-users"></use></svg>Teams
+      </a>
+    </nav>
+
+    <div class="sidebar-label manage-label">MANAGE</div>
+    <nav class="sidebar-nav" aria-label="Administration tools">
+      <a class="nav-link active" href="{{ url_for('admin.audit_log') }}" aria-current="page">
+        <svg class="icon"><use href="#i-clipboard"></use></svg>Audit log
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.settings') }}">
+        <svg class="icon"><use href="#i-settings"></use></svg>Settings
+      </a>
+    </nav>
+    <div class="sidebar-bottom">
+      <form action="{{ url_for('admin.logout') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="sidebar-logout"><svg class="icon"><use href="#i-logout"></use></svg>Sign out</button>
+      </form>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-heading"><h1>Audit log</h1><p>Review saved administrator activity and important changes.</p></div>
+      <div class="topbar-actions">
+        <a class="citizen-button" href="{{ url_for('home') }}">Public website <svg class="icon"><use href="#i-arrow"></use></svg></a>
+        <span class="admin-avatar" aria-label="Signed in as {{ user.full_name }}">{{ user.full_name[:2] | upper }}</span>
+      </div>
+    </header>
+
+    <main class="admin-content manage-content">
+      <div class="manage-heading">
+        <div><p class="manage-eyebrow">NEXACITY / ACTIVITY</p><h2>Administrator activity</h2>
+        <p>Recorded complaint decisions, team changes and administrator account updates.</p></div>
+        <span class="manage-subtitle">Recorded administrator activity</span>
+      </div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}<div class="admin-notice {{ category }}" role="status">{{ message }}</div>{% endfor %}
+      {% endwith %}
+      <section class="manage-card">
+        <div class="manage-card-header">
+          <div><h3>Audit log</h3><p>{{ total }} matching event(s)</p></div>
+          <form method="GET" action="{{ url_for('admin.audit_log') }}" class="manage-filters">
+            <label for="audit-q" class="sr-only">Search audit log</label>
+            <input id="audit-q" type="search" name="q" value="{{ q }}" placeholder="Search actions, people or references" maxlength="80">
+            <label for="audit-group" class="sr-only">Event type</label>
+            <select id="audit-group" name="group">
+              <option value="all" {% if group == 'all' %}selected{% endif %}>All activity</option>
+              <option value="report" {% if group == 'report' %}selected{% endif %}>Report actions</option>
+              <option value="team" {% if group == 'team' %}selected{% endif %}>Team changes</option>
+              <option value="account" {% if group == 'account' %}selected{% endif %}>Account changes</option>
+            </select>
+            <button class="manage-action secondary" type="submit">Filter</button>
+          </form>
+        </div>
+        {% if events %}
+        <div class="audit-list" role="list">
+          {% for event in events %}
+          <article class="audit-row" role="listitem">
+            <span class="audit-symbol audit-{{ event.event_group }}" aria-hidden="true">
+              {% if event.event_group == 'report' %}<svg class="icon"><use href="#i-file"></use></svg>
+              {% elif event.event_group == 'team' %}<svg class="icon"><use href="#i-users"></use></svg>
+              {% else %}<svg class="icon"><use href="#i-shield"></use></svg>{% endif %}
+            </span>
+            <div class="audit-body">
+              <div class="audit-title"><strong>{{ event.action }}</strong>
+                <span class="audit-badge">{{ event.event_group|capitalize }}</span></div>
+              <p class="audit-target">
+                {% if event.report_id %}<a href="{{ url_for('admin.report_detail', complaint_id=event.report_id) }}">{{ event.subject }}</a>
+                {% else %}{{ event.subject }}{% endif %}
+                <span aria-hidden="true">·</span> {{ event.actor }}
+              </p>
+              {% if event.detail %}<p class="audit-detail">{{ event.detail }}</p>{% endif %}
+            </div>
+            <time class="audit-time" datetime="{{ event.happened_at.isoformat() }}">{{ event.happened_at.strftime('%d %b %Y') }}<span>{{ event.happened_at.strftime('%I:%M %p') }}</span></time>
+          </article>
+          {% endfor %}
+        </div>
+        <div class="manage-pagination">
+          {% if page > 1 %}<a href="{{ url_for('admin.audit_log', page=page-1, group=group, q=q) }}">← Previous</a>{% endif %}
+          <span>Page {{ page }} of {{ total_pages }}</span>
+          {% if page < total_pages %}<a href="{{ url_for('admin.audit_log', page=page+1, group=group, q=q) }}">Next →</a>{% endif %}
+        </div>
+        {% else %}
+        <div class="manage-empty"><svg class="icon"><use href="#i-clipboard"></use></svg>
+          <h3>No activity matches your filters</h3>
+          <p>Recorded administrator actions appear here when staff update reports, teams or their accounts.</p>
+          {% if group != 'all' or q %}<a class="manage-action secondary" href="{{ url_for('admin.audit_log') }}">Clear filters</a>{% endif %}
+        </div>
+        {% endif %}
+      </section>
+      <p class="manage-footnote">Audit history is based on existing administrator status-history records and events recorded from Part 7 onward. Earlier team profile edits were not tracked; this is not a complete server access log.</p>
+    </main>
+  </div>
+</div>
+</body>
+</html>

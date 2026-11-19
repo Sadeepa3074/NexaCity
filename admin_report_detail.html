@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Report | NexaCity</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_reports.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_teams.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_management.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_ai.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_workflow.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/civicfix_palette.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nexacity_premium.css') }}">
+</head>
+<body>
+<!-- Small, local SVG icon set; no icon framework required. -->
+<svg aria-hidden="true" class="svg-definitions" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v6h5M9 13h7M9 17h7"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15m6-12v15"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V11m5 9V5m5 15v-8m5 8V8M2 21h20"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 20v-2a7 7 0 0 1 14 0v2M17 5a3 3 0 0 1 0 6m1 3a5 5 0 0 1 4 5v1"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="18" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="m8 13 2 2 5-5M8 18h8"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 20 6v6c0 5-3 8-8 10-5-2-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 4H5v16h4m6-4 4-4-4-4m-9 4h13"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m12 3 10 18H2zM12 9v5m0 3v.2"/></symbol>
+</svg>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="brand-row">
+      <div class="brand-mark"><img src="{{ url_for('static', filename='images/nexacity-symbol-transparent.png') }}" alt="" aria-hidden="true"></div>
+      <div><div class="brand-title">NexaCity</div><div class="brand-subtitle">MUNICIPAL SERVICES</div></div>
+    </div>
+
+    <div class="workspace-note">
+      <svg class="icon"><use href="#i-shield"></use></svg>
+      <div><strong>Authority workspace</strong><span>Administration workspace · Report management</span></div>
+    </div>
+
+    <div class="sidebar-label">WORKSPACE</div>
+    <nav class="sidebar-nav" aria-label="Administration navigation">
+      <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+        <svg class="icon"><use href="#i-grid"></use></svg>Overview
+      </a>
+      <a class="nav-link active" href="{{ url_for('admin.reports') }}" aria-current="page">
+        <svg class="icon"><use href="#i-file"></use></svg>Reports
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.map_hotspots') }}">
+        <svg class="icon"><use href="#i-map"></use></svg>Map &amp; hotspots
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.analytics') }}">
+        <svg class="icon"><use href="#i-chart"></use></svg>Analytics
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.teams') }}">
+        <svg class="icon"><use href="#i-users"></use></svg>Teams
+      </a>
+    </nav>
+
+    <div class="sidebar-label manage-label">MANAGE</div>
+    <nav class="sidebar-nav" aria-label="Administration tools">
+      <a class="nav-link" href="{{ url_for('admin.audit_log') }}">
+        <svg class="icon"><use href="#i-clipboard"></use></svg>Audit log
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.settings') }}">
+        <svg class="icon"><use href="#i-settings"></use></svg>Settings
+      </a>
+    </nav>
+    <div class="sidebar-bottom">
+      <form action="{{ url_for('admin.logout') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="sidebar-logout"><svg class="icon"><use href="#i-logout"></use></svg>Sign out</button>
+      </form>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-heading"><h1>Review report</h1><p>Inspect the original complaint and manage its progress.</p></div>
+      <div class="topbar-actions">
+        <a class="citizen-button" href="{{ url_for('home') }}">Public website <svg class="icon"><use href="#i-arrow"></use></svg></a>
+        <span class="admin-avatar" aria-label="Signed in as {{ user.full_name }}">{{ user.full_name[:2] | upper }}</span>
+      </div>
+    </header>
+
+    <main class="admin-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="admin-notice {{ category }}" role="status">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <div class="report-detail-heading">
+        <div>
+          <div class="report-mini-meta">REPORT REFERENCE</div>
+          <h2>{{ report.reference_code }}</h2>
+          <p>Submitted {{ report.created_at.strftime('%d %B %Y at %I:%M %p') }}</p>
+        </div>
+        <span class="status-pill status-{{ report.status | lower | replace(' ', '-') }}">{{ report.status }}</span>
+      </div>
+
+      <div class="admin-detail-grid">
+        <section class="panel detail-info-panel">
+          <div class="panel-header"><div><h2>Issue information</h2><p>Original report submitted by the citizen</p></div></div>
+          <div class="detail-info-body">
+            <div class="detail-info-row"><span>Category</span><strong>{{ report.category_name or 'Uncategorized' }}</strong></div>
+            <div class="detail-info-row"><span>Reported severity</span><strong>{{ report.severity }}</strong></div>
+            <div class="detail-info-row"><span>Current status</span><strong>{{ report.status }}</strong></div>
+            <div class="detail-info-row"><span>Citizen</span><strong>{{ report.citizen_name }}</strong></div>
+            <div class="detail-info-row"><span>Account email</span><strong>{{ report.citizen_email }}</strong></div>
+            <div class="detail-description"><span>Description</span><p>{{ report.description }}</p></div>
+            {% if report.image_path %}
+              <div class="detail-description"><span>Submitted photo</span>
+                <a href="{{ url_for('admin.report_photo', complaint_id=report.complaint_id) }}" target="_blank" rel="noopener noreferrer">
+                  <img class="admin-report-photo" src="{{ url_for('admin.report_photo', complaint_id=report.complaint_id) }}" alt="Citizen's attached complaint photograph" loading="lazy">
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        </section>
+
+        <section class="panel detail-location-panel">
+          <div class="panel-header"><div><h2>Reported location</h2><p>{{ report.address_text }}{% if report.area_name %} · {{ report.area_name }}{% endif %}</p></div></div>
+          {% if report.latitude is not none and report.longitude is not none %}
+            <div id="admin-report-map" data-lat="{{ report.latitude }}" data-lng="{{ report.longitude }}"></div>
+          {% else %}
+            <div class="panel-empty"><p>Location coordinates were not provided.</p></div>
+          {% endif %}
+          <p class="location-hint">The map shows the citizen's original selected location. No changes are made here.</p>
+        </section>
+      </div>
+
+      <div class="cf-ai-fullpage-container">
+        {% include 'admin_ai_panel.html' %}
+        {% include 'admin_duplicates_panel.html' %}
+        {% include 'admin_priority_panel.html' %}
+      </div>
+
+      {% include 'admin_report_actions.html' %}
+
+      {% if assignment_history %}
+      <section class="panel cf-assignment-history-panel">
+        <div class="panel-header"><div><h2>Team assignment history</h2><p>Previous and current team assignments recorded for this report.</p></div></div>
+        <div class="cf-full-assignment-history">
+          {% for assignment in assignment_history %}
+            <article class="cf-full-assignment-event">
+              <strong>{{ assignment.team_name }}</strong>
+              <span>{{ assignment.assigned_at.strftime('%d %b %Y · %I:%M %p') }}{% if assignment.ended_at %} · Ended{% else %} · Active{% endif %}</span>
+              {% if assignment.officer_name %}<span>Assigned by {{ assignment.officer_name }}</span>{% endif %}
+              {% if assignment.note %}<p>{{ assignment.note }}</p>{% endif %}
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+      <div class="admin-detail-grid admin-detail-grid-history-only">
+        <section class="panel detail-history-panel">
+          <div class="panel-header"><div><h2>Status history</h2><p>Chronological record of updates to this complaint</p></div></div>
+          <div class="history-list">
+            {% for event in history %}
+              <div class="audit-item">
+                <span class="audit-dot"></span>
+                <div>
+                  <strong>{{ event.new_status }}</strong>
+                  <time>{{ event.changed_at.strftime('%d %b %Y · %I:%M %p') }}</time>
+                  {% if event.changed_by_name %}<small>Updated by {{ event.changed_by_name }}</small>{% endif %}
+                  {% if event.note %}<p>{{ event.note }}</p>{% endif %}
+                </div>
+              </div>
+            {% else %}
+              <div class="panel-empty">No status entries recorded yet.</div>
+            {% endfor %}
+          </div>
+        </section>
+      </div>
+      <p class="admin-footer">Team assignments and status updates are recorded in the report history. Field crews are not notified or dispatched automatically.</p>
+    </main>
+  </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{{ url_for('static', filename='js/admin_report_map.js') }}"></script>
+</body>
+</html>

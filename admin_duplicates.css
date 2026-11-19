@@ -1,0 +1,39 @@
+/* CivicFix Phase 5 Part 2. Purely additive styles; safe for drawer and full page. */
+.cf-ai-agreement {background:#fff;border:1px solid #d5e3fb;padding:12px 13px;border-radius:12px;margin:13px 0;}
+.cf-ai-agreement-columns {display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.cf-ai-agreement-columns>div {min-width:0;}
+.cf-ai-agreement-columns small {display:block;color:#7989a7;font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
+.cf-ai-agreement-columns strong {color:#1e3252;font-size:13px;overflow-wrap:anywhere;}
+.cf-ai-agreement-note {font-size:12px;line-height:1.5;margin:11px 0 0;border-radius:9px;padding:9px 11px;font-weight:700;}
+.cf-ai-agreement-note.is-match {background:#e7f7ef;color:#167352;}
+.cf-ai-agreement-note.is-mismatch {background:#fff3dd;color:#93550c;}
+.cf-ai-agreement-note.is-neutral {background:#edf1f7;color:#516884;}
+.cf-duplicates-panel {box-sizing:border-box;margin:23px 0 5px;border:1px solid #dce6f5;border-radius:17px;padding:19px;background:#fff;color:#1a2944;max-width:100%;}
+.cf-duplicates-heading {display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+.cf-duplicates-heading h3 {font-size:16px;color:#172643;margin:3px 0 7px;line-height:1.3;}
+.cf-duplicates-overline {font-size:10px;font-weight:800;color:#5875a7;letter-spacing:.06em;text-transform:uppercase;}
+.cf-duplicates-count {background:#e9efff;color:#3156a8;font-size:11px;font-weight:800;border-radius:30px;padding:7px 10px;}
+.cf-duplicates-explainer,.cf-duplicates-footnote {font-size:11px;line-height:1.7;color:#677b97;margin:6px 0 14px;}
+.cf-duplicates-footnote {margin:14px 0 0;}
+.cf-duplicates-empty {background:#f5f8fe;border:1px dashed #cfdcf0;padding:15px;border-radius:11px;color:#617594;font-size:12px;line-height:1.7;margin:13px 0;}
+.cf-duplicates-list {display:grid;gap:12px;}
+.cf-duplicate-candidate {padding:14px;border:1px solid #e3ebf6;border-radius:13px;background:#fafcff;min-width:0;}
+.cf-duplicate-topline {display:flex;justify-content:space-between;gap:7px;flex-wrap:wrap;align-items:center;}
+.cf-duplicate-topline a {color:#2149ad;font-weight:850;font-size:12px;text-decoration:none;}
+.cf-duplicate-topline a:hover {text-decoration:underline;}
+.cf-duplicate-matchlabel {color:#775a17;background:#fff0d3;padding:5px 8px;border-radius:30px;font-size:10px;font-weight:750;}
+.cf-duplicate-text {font-size:12px;color:#425670;line-height:1.6;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere;}
+.cf-duplicate-facts {display:flex;gap:6px;flex-wrap:wrap;}
+.cf-duplicate-facts span {font-size:10px;font-weight:650;background:#edf2fa;color:#536985;border-radius:7px;padding:5px 7px;}
+.cf-duplicate-reviewed {font-size:11px;margin:10px 0 0;font-weight:750;}
+.cf-duplicate-reviewed.is-same {color:#14734e;}
+.cf-duplicate-reviewed.is-different {color:#695f76;}
+.cf-duplicate-reviewed.is-new {color:#aa701b;}
+.cf-duplicate-actions {display:flex;gap:8px;flex-wrap:wrap;margin:11px 0 0;}
+.cf-duplicate-actions form {margin:0;}
+.cf-duplicate-actions button {border-radius:8px;padding:9px 12px;font-size:11px;font-weight:750;cursor:pointer;border:1px solid #ccd8e8;}
+.cf-duplicate-actions button:disabled {opacity:.6;cursor:wait;}
+.cf-dup-same {background:#2563eb;color:#fff;border-color:#2563eb !important;}
+.cf-dup-different {background:#fff;color:#314766;}
+.cf-duplicate-actions button:focus-visible,.cf-duplicate-topline a:focus-visible {outline:3px solid #a7c7ff;outline-offset:2px;}
+@media (max-width:520px) {.cf-ai-agreement-columns {grid-template-columns:1fr;} .cf-duplicates-panel {padding:14px;} }
