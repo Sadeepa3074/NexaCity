@@ -1,0 +1,68 @@
+/* CivicFix Admin Reports — original CSS; extends admin.css without changing it. */
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.report-management-panel{overflow:hidden}
+.reports-section-head{padding-bottom:12px}
+.reports-filters{padding:8px 24px 18px}
+.report-search-form{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.report-search-form input{border:1px solid #dfe6f3;border-radius:11px;padding:12px 14px;outline:none;min-width:220px;flex:1;max-width:410px;background:#fff;color:#111b32;font-size:13px}
+.report-search-form input:focus{border-color:#537bf3;box-shadow:0 0 0 3px #ebefff}
+.admin-primary-button{border:0;border-radius:11px;background:linear-gradient(105deg,#4d42e1,#2072eb);color:#fff;font-size:12px;font-weight:750;padding:12px 18px;line-height:1.3}
+.admin-primary-button:hover{filter:brightness(1.07)}
+.admin-clear-button{font-size:12px;color:#667899;text-decoration:underline}
+.report-tabs{display:flex;align-items:center;overflow-x:auto;gap:5px;border-top:1px solid #eef1f8;border-bottom:1px solid #eef1f8;padding:0 17px}
+.report-tab{font-size:12px;font-weight:700;white-space:nowrap;padding:15px 12px;color:#8ca0bf;border-bottom:2px solid transparent}
+.report-tab:hover{color:#2867ef}
+.report-tab.selected{color:#2d66ed;border-bottom-color:#2d66ed}
+.reports-table-scroll{overflow-x:auto}
+.reports-table{border-collapse:collapse;width:100%;min-width:720px}
+.reports-table thead{background:#f5f8fc;color:#8da0bc;text-transform:uppercase;letter-spacing:.055em;font-size:10px}
+.reports-table th,.reports-table td{padding:19px 18px;text-align:left;border-bottom:1px solid #edf0f7;vertical-align:middle}
+.reports-table tbody tr:hover{background:#fbfcff}
+.reports-table th:first-child,.reports-table td:first-child{padding-left:24px;width:46%}
+.report-name-link{display:block;font-weight:750;line-height:1.5;font-size:13px;color:#18233a}
+.report-name-link:hover,.report-open-link:hover{color:#2e66ef}
+.report-mini-meta{font-size:11px;color:#8fa1bc;margin-top:7px;line-height:1.6;overflow-wrap:anywhere}
+.report-date{white-space:nowrap;color:#8294b0;font-size:12px}
+.report-open-link{white-space:nowrap;font-size:12px;font-weight:750;color:#3169eb}
+.severity-badge{padding:7px 10px;font-size:11px;font-weight:700;border-radius:8px;background:#eef2fa;color:#55647d}
+.severity-high{background:#fff0ed;color:#d34c2b}
+.severity-medium{background:#fff7e6;color:#ad6b08}
+.severity-low{background:#e7f9f2;color:#118b65}
+.no-results{text-align:center !important;padding:40px 16px !important;color:#7789a5;font-size:13px}
+.admin-pagination{display:flex;justify-content:space-between;align-items:center;padding:21px 24px;color:#8b9db8;font-size:12px}
+.admin-pagination a{font-weight:700;color:#3268e9}
+.admin-back{display:inline-block;color:#3d65cc;font-weight:700;font-size:12px;margin-bottom:22px}
+.admin-back:hover{text-decoration:underline}
+.admin-notice{border:1px solid #d7e4fc;background:#edf4ff;color:#27549b;padding:13px 16px;border-radius:11px;margin-bottom:18px;font-size:12px;font-weight:650;line-height:1.6}
+.admin-notice.success{background:#ebfaf2;border-color:#bfebd5;color:#15754f}
+.admin-notice.error{background:#fff0f1;border-color:#f2c8ca;color:#b53242}
+.report-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:25px}
+.report-detail-heading h2{margin:7px 0 7px;font-size:24px;letter-spacing:-.6px}
+.report-detail-heading p{font-size:12px;color:#7c8fa9;margin:0}
+.admin-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-bottom:24px;align-items:start}
+.admin-detail-grid .panel{margin-bottom:0}
+.detail-info-body{padding:3px 24px 26px}
+.detail-info-row{display:flex;justify-content:space-between;align-items:baseline;gap:15px;border-bottom:1px solid #f0f2f8;padding:12px 0}
+.detail-info-row>span,.detail-description>span{font-size:12px;color:#8293ae}
+.detail-info-row strong{font-size:12px;line-height:1.7;text-align:right;overflow-wrap:anywhere}
+.detail-description{padding-top:19px}
+.detail-description>span{display:block;font-weight:700;margin-bottom:9px}
+.detail-description p{font-size:13px;line-height:1.85;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.admin-report-photo{display:block;margin-top:12px;max-width:100%;max-height:300px;object-fit:contain;border-radius:12px;background:#f4f7fc}
+#admin-report-map{height:310px;width:calc(100% - 48px);margin:0 24px;border-radius:12px;border:1px solid #e0e6ef;background:#f1f5fa;z-index:0}
+.location-hint{font-size:11px;color:#8898b0;margin:16px 24px 23px;line-height:1.6}
+.admin-form-label{font-size:12px;font-weight:750;display:block;margin:14px 0 9px}
+.admin-form-input{width:100%;border:1px solid #dfe6f3;border-radius:11px;padding:12px 13px;color:#14243c;background:#fff;font:inherit;font-size:13px}
+.admin-form-input:focus{outline:3px solid #eaf0ff;border-color:#4a75ef}
+textarea.admin-form-input{resize:vertical;line-height:1.6;min-height:100px}
+.status-submit{margin-top:17px;width:100%}
+.admin-form-hint{font-size:11px;color:#8294ae;line-height:1.7;margin:19px 0 0}
+.history-list{padding:5px 25px 25px}
+.audit-item{border-left:2px solid #dce7ff;padding:3px 0 24px 24px;margin-left:7px;position:relative}
+.audit-item:last-child{border-left-color:transparent;padding-bottom:2px}
+.audit-dot{position:absolute;left:-8px;top:4px;height:14px;width:14px;border:3px solid #fff;box-shadow:0 0 0 2px #b4cbff;background:#3370ed;border-radius:50%}
+.audit-item strong{display:block;font-size:13px;margin-bottom:6px}
+.audit-item time,.audit-item small{display:block;color:#8293af;font-size:11px;margin-bottom:5px}
+.audit-item p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65;color:#4a5e79;font-size:12px;margin:10px 0 0}
+@media(max-width:1100px){.admin-detail-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.reports-filters{padding-inline:16px}.report-search-form input{max-width:none;width:100%;flex-basis:100%}.reports-table th:first-child,.reports-table td:first-child{padding-left:15px}.admin-detail-grid{gap:15px}.detail-info-body{padding:0 17px 20px}.history-list{padding:4px 17px 20px}.report-detail-heading{align-items:flex-start;flex-direction:column}.report-detail-heading h2{font-size:20px}#admin-report-map{width:calc(100% - 34px);margin:0 17px}}

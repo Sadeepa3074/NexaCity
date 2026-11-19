@@ -1,0 +1,64 @@
+{% set duplicates = civicfix_duplicates(report) %}
+<section class="cf-duplicates-panel" aria-label="Nearby similar reports">
+  <header class="cf-duplicates-heading">
+    <div>
+      <span class="cf-duplicates-overline">REPORT REVIEW</span>
+      <h3>Nearby similar reports</h3>
+    </div>
+    {% if duplicates.state == 'ready' %}
+      <span class="cf-duplicates-count">{{ duplicates.matches|length }} candidate{{ '' if duplicates.matches|length == 1 else 's' }}</span>
+    {% endif %}
+  </header>
+  <p class="cf-duplicates-explainer">Compares recent reports by location and description to highlight <strong>possible matches</strong> for administrator review.</p>
+  {% if duplicates.state == 'missing_coordinates' %}
+    <p class="cf-duplicates-empty">This report has no map coordinates, so location-aware duplicate detection is unavailable.</p>
+  {% elif duplicates.state == 'database_unavailable' %}
+    <p class="cf-duplicates-empty">Duplicate review records are currently unavailable. Please try again later or contact the system administrator.</p>
+  {% elif duplicates.state == 'engine_unavailable' %}
+    <p class="cf-duplicates-empty">Similarity review is temporarily unavailable. Please try again later.</p>
+  {% elif duplicates.matches %}
+    <div class="cf-duplicates-list">
+      {% for candidate in duplicates.matches %}
+      <article class="cf-duplicate-candidate">
+        <div class="cf-duplicate-topline">
+          <a href="{{ url_for('admin.report_detail', complaint_id=candidate.complaint_id) }}" data-cf-drawer-link>{{ candidate.reference_code }} ↗</a>
+          <span class="cf-duplicate-matchlabel">{{ candidate.match_label }}</span>
+        </div>
+        <p class="cf-duplicate-text">{{ candidate.description }}</p>
+        <div class="cf-duplicate-facts">
+          <span>{{ candidate.distance_m }} m away</span>
+          <span>{{ candidate.text_similarity }}% text similarity</span>
+          <span>{{ candidate.category_name }}</span>
+          <span>{{ candidate.status }}</span>
+        </div>
+        {% if candidate.decision == 'same' %}
+          <p class="cf-duplicate-reviewed is-same">✓ Officer confirmed: same issue</p>
+        {% elif candidate.decision == 'different' %}
+          <p class="cf-duplicate-reviewed is-different">Officer reviewed: different issues</p>
+        {% else %}
+          <p class="cf-duplicate-reviewed is-new">Needs human review</p>
+        {% endif %}
+        <div class="cf-duplicate-actions">
+          <form data-cf-async-form method="POST"
+                action="{{ url_for('admin.review_duplicate', complaint_id=report.complaint_id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="other_complaint_id" value="{{ candidate.complaint_id }}">
+            <input type="hidden" name="decision" value="same">
+            <button type="submit" class="cf-dup-same">Same issue</button>
+          </form>
+          <form data-cf-async-form method="POST"
+                action="{{ url_for('admin.review_duplicate', complaint_id=report.complaint_id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="other_complaint_id" value="{{ candidate.complaint_id }}">
+            <input type="hidden" name="decision" value="different">
+            <button type="submit" class="cf-dup-different">Different issues</button>
+          </form>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="cf-duplicates-empty">No likely matches were found among the nearby reports reviewed. Please use your judgement when assessing this complaint.</p>
+  {% endif %}
+  <p class="cf-duplicates-footnote">Similarity results are a guide, not a confirmation. Review each suggested match before recording a decision; reports are never merged automatically.</p>
+</section>

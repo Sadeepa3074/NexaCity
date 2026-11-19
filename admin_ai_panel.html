@@ -1,0 +1,79 @@
+{% set ai = civicfix_ai_context(report) %}
+<section class="cf-ai-section cf-ai-v2" aria-label="AI-assisted complaint classification">
+  <div class="cf-ai-v2-heading">
+    <h3>✧ AI-assisted triage</h3>
+    {% if ai.prediction.state == 'ready' %}
+      <span class="cf-ai-v2-state {{ 'is-demo' if ai.prediction.is_demo else 'is-trained' }}">
+        {{ 'Sample-based suggestions' if ai.prediction.is_demo else 'Category suggestions active' }}
+      </span>
+    {% else %}
+      <span class="cf-ai-v2-state is-offline">Model not active</span>
+    {% endif %}
+  </div>
+
+  {% if ai.prediction.state == 'ready' %}
+    <div class="cf-ai-v2-prediction">
+      <div>
+        <span class="cf-ai-v2-eyebrow">Suggested category</span>
+        <strong class="cf-ai-v2-predicted">{{ ai.prediction.category }}</strong>
+        <small>{% if ai.prediction.is_demo %}Initial suggestion · confirm before acting{% else %}{{ ai.prediction.estimated_probability }}% model estimate · guidance only{% endif %}</small>
+      </div>
+      <div>
+        <span class="cf-ai-v2-eyebrow">Human verification</span>
+        <strong>{{ 'Required' if not ai.verified else 'Category verified' }}</strong>
+        <small>{{ 'Prediction may be uncertain' if ai.prediction.low_confidence else 'Review against complaint details' }}</small>
+      </div>
+    </div>
+    <div class="cf-ai-agreement">
+      <div class="cf-ai-agreement-columns">
+        <div><small>Citizen selected</small><strong>{{ report.category_name or 'Uncategorized' }}</strong></div>
+        <div><small>AI suggests</small><strong>{{ ai.prediction.category }}</strong></div>
+      </div>
+      {% if not report.category_name %}
+        <p class="cf-ai-agreement-note is-neutral">No citizen category selected. Officer review recommended.</p>
+      {% elif ai.prediction.category | lower == report.category_name | lower %}
+        <p class="cf-ai-agreement-note is-match">Both selections match. Confirm the category against the report details.</p>
+      {% else %}
+        <p class="cf-ai-agreement-note is-mismatch">The selected and suggested categories differ. Review the description before confirming the category.</p>
+      {% endif %}
+    </div>
+    {% if ai.prediction.is_demo %}
+      <p class="cf-ai-v2-warning"><strong>Initial evaluation:</strong> Confirm this suggestion against the citizen's report details before taking action.</p>
+    {% else %}
+      <p class="cf-ai-v2-warning">Suggestions are advisory. Review the description and location before confirming a category.</p>
+    {% endif %}
+  {% elif ai.prediction.state == 'not_trained' %}
+    <p class="cf-ai-v2-empty">Category suggestions are not available yet. Administrators can still review the report and confirm its category manually.</p>
+  {% elif ai.prediction.state == 'insufficient_text' %}
+    <p class="cf-ai-v2-empty">The complaint text is too short for a useful classification suggestion.</p>
+  {% else %}
+    <p class="cf-ai-v2-empty">Category suggestions are temporarily unavailable. You can continue reviewing this report.</p>
+  {% endif %}
+
+  <div class="cf-ai-v2-confirm">
+    <h4>Confirm complaint category</h4>
+    <p>Choose the category that best matches the report. Your confirmation is saved separately and does <strong>not</strong> change the citizen's original submission or report status.</p>
+    {% if ai.database_unavailable %}
+      <p class="cf-ai-v2-warning">Category confirmations are temporarily unavailable. Please try again later.</p>
+    {% elif ai.categories %}
+      <form class="cf-ai-v2-form" method="POST" data-cf-async-form
+            action="{{ url_for('admin.verify_report_category', complaint_id=report.complaint_id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="cf-ai-category-{{ report.complaint_id }}">Correct category</label>
+        <select id="cf-ai-category-{{ report.complaint_id }}" name="category_id" required>
+          <option value="">Select category after review</option>
+          {% for item in ai.categories %}
+          <option value="{{ item.category_id }}" {% if ai.verified == item.category_id %}selected{% endif %}>
+            {{ item.category_name }}
+          </option>
+          {% endfor %}
+        </select>
+        <button type="submit">{{ 'Update confirmed category' if ai.verified else 'Save confirmed category' }}</button>
+      </form>
+      <p class="cf-ai-v2-meta">Your confirmation is recorded separately for future review.</p>
+    {% else %}
+      <p class="cf-ai-v2-empty">No report categories are currently available for verification.</p>
+    {% endif %}
+  </div>
+  <p class="cf-ai-v2-footnote">AI suggestions, similar-report matches and priority guidance are advisory. The administrator makes and records every report decision.</p>
+</section>

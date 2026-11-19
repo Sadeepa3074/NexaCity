@@ -1,0 +1,41 @@
+@import url("./admin_duplicates.css");
+@import url("./admin_priority.css");
+/* CivicFix Phase 5 Part 1 — AI classifier panel. Scoped to avoid changes elsewhere. */
+.cf-ai-v2 {padding: 19px !important; margin-top: 16px; border: 1px solid #cfe1ff !important;
+  border-radius: 17px; background: #f3f8ff !important; color: #162545;}
+.cf-ai-v2-heading {display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:14px;}
+.cf-ai-v2-heading h3 {font-size:16px; line-height:1.35; font-weight:800; margin:0; color:#103ca2;}
+.cf-ai-v2-state {font-size:11px; padding:6px 10px; border-radius:20px; font-weight:700;
+  color:#0e6f51; background:#dff8ed;}
+.cf-ai-v2-state.is-demo {background:#fff1d6; color:#975a0b;}
+.cf-ai-v2-state.is-offline {background:#edf1f8; color:#58708f;}
+.cf-ai-v2-prediction {display:grid;grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:10px;}
+.cf-ai-v2-prediction>div {background:#fff;border:1px solid #e8effb;border-radius:13px;padding:12px 13px;min-width:0;}
+.cf-ai-v2-eyebrow {display:block; font-size:10px;letter-spacing:.055em;text-transform:uppercase;
+  color:#7387a9;font-weight:800;margin-bottom:7px;}
+.cf-ai-v2-prediction strong {display:block;font-weight:800;color:#1a2944;font-size:14px;line-height:1.4;}
+.cf-ai-v2-prediction .cf-ai-v2-predicted {color:#1745bb;}
+.cf-ai-v2-prediction small {display:block;font-size:11px;color:#6c7c98;line-height:1.5;margin-top:5px;}
+.cf-ai-v2-warning {font-size:12px;line-height:1.6;color:#81551c;background:#fff9e9;
+  border:1px solid #f4e3af;border-radius:10px;padding:10px 12px;margin:12px 0;}
+.cf-ai-v2-metrics {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:13px 0;}
+.cf-ai-v2-metrics span {padding:9px;background:#e9f1ff;border-radius:9px;font-size:11px; color:#50648a;}
+.cf-ai-v2-metrics strong {font-size:14px;color:#1c478e;margin-right:4px;}
+.cf-ai-v2-meta {font-size:11px;line-height:1.55;color:#6c82a4;margin:8px 0 0;}
+.cf-ai-v2-empty {color:#536986;font-size:13px;line-height:1.7;margin:8px 0 16px;}
+.cf-ai-v2-confirm {margin-top:19px;padding-top:16px;border-top:1px solid #cbdcf3;}
+.cf-ai-v2-confirm h4 {color:#1c2c49;font-weight:800;margin:0 0 7px;font-size:14px;}
+.cf-ai-v2-confirm>p {font-size:12px;color:#677a97;line-height:1.6;margin:0 0 11px;}
+.cf-ai-v2-form {display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:9px;}
+.cf-ai-v2-form label {grid-column:1 / -1;font-weight:700;font-size:12px;color:#345278;margin-bottom:-3px;}
+.cf-ai-v2-form select {box-sizing:border-box;min-width:0;width:100%;height:43px;border:1px solid #d5e0ee;
+  background:#fff;border-radius:10px;padding:0 11px;font-size:12px;color:#1b2c4c;}
+.cf-ai-v2-form button {min-height:43px;white-space:nowrap;color:#fff;background:#2563eb;border:0;border-radius:10px;
+  font-weight:700;font-size:12px;padding:9px 13px;cursor:pointer;}
+.cf-ai-v2-form button:hover {background:#1d4ed8;}
+.cf-ai-v2-form button:focus-visible,.cf-ai-v2-form select:focus-visible {outline:3px solid #a7c7ff;outline-offset:2px;}
+.cf-ai-v2-form button:disabled {opacity:.6;cursor:wait;}
+.cf-ai-v2-footnote {color:#7082a0;font-size:11px;line-height:1.5;margin:16px 0 0;}
+.cf-ai-fullpage-container {max-width:1200px;margin:20px 0;}
+@media (max-width:600px) { .cf-ai-v2-prediction,.cf-ai-v2-metrics {grid-template-columns:1fr;}
+  .cf-ai-v2-form {grid-template-columns:1fr;} .cf-ai-v2-form button {width:100%;} }
