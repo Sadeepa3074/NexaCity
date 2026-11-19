@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#172B4D">
+    <title>My Reports | NexaCity</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/civicfix_palette.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/citizen_workspace.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/citizen_experience.css') }}">
+</head>
+<body class="citizen-dashboard-body citizen-reports-body">
+    {% include 'citizen_header.html' %}
+
+    <main class="citizen-dashboard-shell citizen-reports-shell">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="citizen-flash-stack" aria-live="polite">
+                    {% for category, message in messages %}
+                        <div class="citizen-flash {{ category }}" role="status">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <section class="citizen-reports-intro">
+            <div>
+                <span class="citizen-reports-kicker">CITIZEN WORKSPACE</span>
+                <h1>My Reports</h1>
+                <p>Keep track of every issue you've shared and follow its progress through NexaCity.</p>
+            </div>
+            <a class="citizen-primary-action" href="{{ url_for('submit_complaint') }}">
+                <span aria-hidden="true">+</span> Report an issue
+            </a>
+        </section>
+
+        <section class="citizen-report-stat-grid" aria-label="Your report summary">
+            <article class="citizen-report-stat-card">
+                <span class="citizen-report-stat-label">All reports</span>
+                <strong>{{ report_stats.total or 0 }}</strong>
+                <small>Reports submitted from your account</small>
+            </article>
+            <article class="citizen-report-stat-card stat-active">
+                <span class="citizen-report-stat-label">Active</span>
+                <strong>{{ report_stats.active or 0 }}</strong>
+                <small>Submitted, under review or being handled</small>
+            </article>
+            <article class="citizen-report-stat-card stat-resolved">
+                <span class="citizen-report-stat-label">Resolved</span>
+                <strong>{{ report_stats.resolved or 0 }}</strong>
+                <small>Issues marked as resolved</small>
+            </article>
+        </section>
+
+        <section class="citizen-reports-panel">
+            <div class="citizen-reports-panel-heading">
+                <div>
+                    <span class="citizen-reports-kicker">YOUR SUBMISSIONS</span>
+                    <h2>Complaint history</h2>
+                    <p>{{ total }} matching report{% if total != 1 %}s{% endif %}{% if search_term %} for “{{ search_term }}”{% endif %}</p>
+                </div>
+            </div>
+
+            <form class="citizen-reports-filter" method="GET" action="{{ url_for('my_complaints') }}">
+                <label class="citizen-reports-search">
+                    <span class="sr-only">Search your reports</span>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                    <input type="search" name="q" maxlength="100" value="{{ search_term }}"
+                           placeholder="Search reference, description or area">
+                </label>
+                <label class="citizen-reports-status-filter">
+                    <span>Status</span>
+                    <select name="status">
+                        <option value="All" {% if selected_status == 'All' %}selected{% endif %}>All statuses</option>
+                        {% for status in statuses %}
+                            <option value="{{ status }}" {% if selected_status == status %}selected{% endif %}>{{ status }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <button class="citizen-filter-button" type="submit">Apply filters</button>
+                {% if search_term or selected_status != 'All' %}
+                    <a class="citizen-clear-filters" href="{{ url_for('my_complaints') }}">Clear</a>
+                {% endif %}
+            </form>
+
+            {% if complaints %}
+                <div class="citizen-record-list">
+                    {% for complaint in complaints %}
+                        <article class="citizen-record-card">
+                            <div class="citizen-record-topline">
+                                <div class="citizen-record-identity">
+                                    <span class="citizen-record-reference">{{ complaint.reference_code }}</span>
+                                    <span class="citizen-record-category">{{ complaint.category_name or 'Uncategorized' }}</span>
+                                </div>
+                                <span class="citizen-status-pill status-{{ complaint.status|lower|replace(' ', '-') }}">
+                                    <i aria-hidden="true"></i>{{ complaint.status }}
+                                </span>
+                            </div>
+
+                            <p class="citizen-record-description">{{ complaint.description | striptags | truncate(220, True, '…') }}</p>
+
+                            <div class="citizen-record-meta">
+                                <span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 10.2c0 5-7 10-7 10s-7-5-7-10a7 7 0 1 1 14 0Z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg>{{ complaint.area_name or complaint.address_text }}</span>
+                                <span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9h17" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>{{ complaint.created_at.strftime('%d %b %Y') }}</span>
+                                <span class="severity-{{ complaint.severity|lower }}">{{ complaint.severity }} severity</span>
+                            </div>
+
+                            <div class="citizen-record-footer">
+                                <span>Updated {{ complaint.updated_at.strftime('%d %b %Y') if complaint.updated_at else complaint.created_at.strftime('%d %b %Y') }}</span>
+                                <a href="{{ url_for('complaint_detail', complaint_id=complaint.complaint_id) }}">
+                                    View details &amp; tracking <span aria-hidden="true">→</span>
+                                </a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+
+                {% if total_pages > 1 %}
+                    <nav class="citizen-report-pagination" aria-label="Report pages">
+                        {% if page > 1 %}
+                            <a href="{{ url_for('my_complaints', page=page-1, status=selected_status, q=search_term) }}">← Previous</a>
+                        {% else %}<span class="pagination-disabled">← Previous</span>{% endif %}
+                        <span>Page <strong>{{ page }}</strong> of {{ total_pages }}</span>
+                        {% if page < total_pages %}
+                            <a href="{{ url_for('my_complaints', page=page+1, status=selected_status, q=search_term) }}">Next →</a>
+                        {% else %}<span class="pagination-disabled">Next →</span>{% endif %}
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="citizen-reports-empty">
+                    <div class="citizen-reports-empty-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l5 5v12H7a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.7"/><path d="M14 3.5v5h5M9 13h7M9 17h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                    </div>
+                    <h3>{% if search_term or selected_status != 'All' %}No matching reports{% else %}Your first report starts here{% endif %}</h3>
+                    <p>{% if search_term or selected_status != 'All' %}Try another search term or choose a different status filter.{% else %}When you report a local issue, you'll be able to follow its progress and updates here.{% endif %}</p>
+                    {% if search_term or selected_status != 'All' %}
+                        <a class="citizen-secondary-action" href="{{ url_for('my_complaints') }}">Clear filters</a>
+                    {% else %}
+                        <a class="citizen-primary-action" href="{{ url_for('submit_complaint') }}"><span aria-hidden="true">+</span> Report an issue</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="citizen-reports-help">
+            <span class="citizen-reports-help-mark" aria-hidden="true">i</span>
+            <div><strong>Every update is recorded</strong><p>Open a report to see its status timeline and notes shared by the NexaCity administrator.</p></div>
+        </section>
+    </main>
+
+    {% include 'citizen_footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/citizen_dashboard.js') }}" defer></script>
+</body>
+</html>

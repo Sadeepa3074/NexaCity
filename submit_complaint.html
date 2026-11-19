@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f4f7fc">
+    <title>Report an Issue | NexaCity</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/civicfix_palette.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/citizen_experience.css') }}">
+</head>
+<body class="citizen-dashboard-body citizen-report-page">
+    {% include 'citizen_header.html' %}
+
+    <main class="citizen-report-shell">
+        <div class="citizen-report-page-heading">
+            <span class="citizen-footer-kicker">HELP IMPROVE YOUR NEIGHBOURHOOD</span>
+            <h1>Report an issue</h1>
+            <p>Tell us what needs attention. Add the details and select the location so the right team can review your report.</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="citizen-flash-stack" aria-live="polite">
+                    {% for category, message in messages %}
+                        <div class="citizen-flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form id="citizen-report-form" class="citizen-report-form" method="POST"
+              action="{{ url_for('submit_complaint') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <section class="citizen-report-section">
+                <div class="citizen-report-section-heading">
+                    <span class="citizen-report-section-number">01</span>
+                    <div><h2>Tell us what happened</h2><p>Describe the issue clearly so the authority can understand it.</p></div>
+                </div>
+
+                <div class="citizen-report-field-grid">
+                    <label class="citizen-report-field citizen-report-field-full" for="category_id">
+                        <span>Issue category <em>*</em></span>
+                        <select id="category_id" name="category_id" required>
+                            <option value="">Choose a category</option>
+                            {% for category in categories %}
+                                <option value="{{ category.category_id }}">{{ category.category_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small>Select the category that best describes the problem. NexaCity's AI may independently suggest a category for administrator review.</small>
+                    </label>
+
+                    <label class="citizen-report-field citizen-report-field-full" for="description">
+                        <span>Describe the issue <em>*</em></span>
+                        <textarea id="description" name="description" minlength="10" maxlength="3000" rows="5" required
+                                  placeholder="For example: There is a large pothole near the school crossing. It is difficult for vehicles and pedestrians to pass safely."></textarea>
+                        <small>Use at least 10 characters. Include useful details such as what happened and nearby landmarks.</small>
+                    </label>
+
+                    <label class="citizen-report-field" for="severity">
+                        <span>How serious is the issue? <em>*</em></span>
+                        <select id="severity" name="severity" required>
+                            <option value="Low">Low</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                        <small>Choose the severity based on the impact you can observe.</small>
+                    </label>
+
+                    <label class="citizen-report-field" for="area">
+                        <span>Area / neighbourhood</span>
+                        <input type="text" id="area" name="area" maxlength="100" placeholder="e.g. Negombo, Ward 4">
+                        <small>Optional. Helps the authority identify the area.</small>
+                    </label>
+                </div>
+            </section>
+
+            <section class="citizen-report-section">
+                <div class="citizen-report-section-heading">
+                    <span class="citizen-report-section-number">02</span>
+                    <div><h2>Where is the issue?</h2><p>Enter an address and select the exact point on the map.</p></div>
+                </div>
+
+                <label class="citizen-report-field citizen-report-field-full" for="address">
+                    <span>Street address or nearby landmark <em>*</em></span>
+                    <input type="text" id="address" name="address" minlength="5" maxlength="255" required
+                           placeholder="Street name, building, junction or nearby landmark">
+                    <small>Provide enough detail for the maintenance team to find the location.</small>
+                </label>
+
+                <div class="citizen-map-heading">
+                    <div><strong>Select location on map <em>*</em></strong><small>Colombo coverage only. Click the map to place or adjust the marker.</small></div>
+                    <button type="button" id="use-current-location" class="citizen-location-button">
+                        <span aria-hidden="true">◎</span> Use my current location
+                    </button>
+                </div>
+                <div id="complaint-map" class="citizen-complaint-map" role="application" aria-label="Select complaint location on map"></div>
+                <p id="selected-location" class="citizen-selected-location" aria-live="polite">No location selected yet. Click the map or use your current location.</p>
+                <input type="hidden" id="latitude" name="latitude" value="">
+                <input type="hidden" id="longitude" name="longitude" value="">
+                <p id="map-error" class="citizen-map-error" role="alert"></p>
+            </section>
+
+            <section class="citizen-report-section citizen-report-photo-section">
+                <div class="citizen-report-section-heading">
+                    <span class="citizen-report-section-number">03</span>
+                    <div><h2>Add a photo <span class="citizen-optional-label">Optional</span></h2><p>A photo can help the authority understand the problem.</p></div>
+                </div>
+                <label class="citizen-upload-box" for="photo">
+                    <span class="citizen-upload-icon" aria-hidden="true">↑</span>
+                    <strong>Choose a photo to upload</strong>
+                    <span>JPG, PNG or WebP · Maximum 5 MB</span>
+                    <input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp">
+                    <span id="photo-file-name" class="citizen-photo-file-name">No file selected</span>
+                </label>
+            </section>
+
+            <div class="citizen-report-form-footer">
+                <p>Your report will be saved securely and can be tracked from your NexaCity dashboard.</p>
+                <div class="citizen-report-form-actions">
+                    <a class="citizen-report-cancel" href="{{ url_for('citizen_dashboard') }}">Cancel</a>
+                    <button class="citizen-primary-action" type="submit"><span aria-hidden="true">＋</span> Submit report</button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="{{ url_for('static', filename='js/citizen_report.js') }}" defer></script>
+    {% include 'citizen_footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/citizen_dashboard.js') }}" defer></script>
+</body>
+</html>

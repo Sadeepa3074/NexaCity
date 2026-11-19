@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#172B4D">
+    <title>{{ complaint.reference_code }} | NexaCity</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/civicfix_palette.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/citizen_workspace.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/citizen_experience.css') }}">
+</head>
+<body class="citizen-dashboard-body citizen-detail-body">
+    {% include 'citizen_header.html' %}
+
+    <main class="citizen-dashboard-shell citizen-detail-shell">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="citizen-flash-stack" aria-live="polite">
+                    {% for category, message in messages %}<div class="citizen-flash {{ category }}" role="status">{{ message }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <section class="citizen-detail-hero">
+            <div>
+                <span class="citizen-reports-kicker">COMPLAINT TRACKING</span>
+                <h1>{{ complaint.reference_code }}</h1>
+                <p>Submitted {{ complaint.created_at.strftime('%d %B %Y at %I:%M %p') }}</p>
+            </div>
+            <span class="citizen-status-pill status-{{ complaint.status|lower|replace(' ', '-') }}"><i aria-hidden="true"></i>{{ complaint.status }}</span>
+        </section>
+
+        <div class="citizen-detail-grid">
+            <section class="citizen-detail-card">
+                <div class="citizen-detail-card-heading"><span class="citizen-detail-icon">01</span><div><h2>Issue information</h2><p>The details you shared with NexaCity.</p></div></div>
+                <dl class="citizen-detail-fields">
+                    <div><dt>Category</dt><dd>{{ complaint.category_name or 'Uncategorized' }}</dd></div>
+                    <div><dt>Reported severity</dt><dd>{{ complaint.severity }}</dd></div>
+                    <div class="field-description"><dt>Description</dt><dd>{{ complaint.description }}</dd></div>
+                </dl>
+                {% if complaint.image_path %}
+                    <div class="citizen-detail-photo-wrap">
+                        <span class="citizen-detail-field-label">Attached photograph</span>
+                        <a href="{{ url_for('complaint_photo', complaint_id=complaint.complaint_id) }}" target="_blank" rel="noopener noreferrer">
+                            <img class="citizen-detail-photo" src="{{ url_for('complaint_photo', complaint_id=complaint.complaint_id) }}" alt="Photograph submitted with complaint" loading="lazy">
+                        </a>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="citizen-detail-card">
+                <div class="citizen-detail-card-heading"><span class="citizen-detail-icon">02</span><div><h2>Reported location</h2><p>Original location selected when the report was submitted.</p></div></div>
+                <dl class="citizen-detail-fields">
+                    <div><dt>Address / landmark</dt><dd>{{ complaint.address_text }}</dd></div>
+                    {% if complaint.area_name %}<div><dt>Area</dt><dd>{{ complaint.area_name }}</dd></div>{% endif %}
+                </dl>
+                {% if complaint.latitude is not none and complaint.longitude is not none %}
+                    <div id="detail-map" class="citizen-detail-map" data-lat="{{ complaint.latitude }}" data-lng="{{ complaint.longitude }}" role="region" aria-label="Map showing the reported location"></div>
+                {% else %}
+                    <div class="citizen-detail-map-empty">No map coordinates were saved for this report.</div>
+                {% endif %}
+            </section>
+        </div>
+
+        <section class="citizen-detail-card citizen-timeline-card">
+            <div class="citizen-detail-card-heading"><span class="citizen-detail-icon">03</span><div><h2>Status timeline</h2><p>Follow the recorded progress of your complaint.</p></div></div>
+            {% if status_history %}
+                <div class="citizen-detail-timeline">
+                    {% for entry in status_history %}
+                        <article class="citizen-detail-timeline-entry">
+                            <span class="citizen-detail-timeline-dot" aria-hidden="true"></span>
+                            <div class="citizen-detail-timeline-content">
+                                <div class="citizen-detail-timeline-top"><strong>{{ entry.new_status }}</strong><time>{{ entry.changed_at.strftime('%d %b %Y · %I:%M %p') }}</time></div>
+                                {% if entry.note %}<p>{{ entry.note }}</p>{% endif %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="citizen-reports-empty compact-empty"><h3>No updates yet</h3><p>Status changes will appear here when an administrator reviews your report.</p></div>
+            {% endif %}
+        </section>
+
+        <div class="citizen-detail-bottom-actions">
+            <a class="citizen-primary-action" href="{{ url_for('submit_complaint') }}"><span aria-hidden="true">+</span> Report another issue</a>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    {% include 'citizen_footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/citizen_dashboard.js') }}" defer></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const element = document.getElementById('detail-map');
+        if (!element || typeof L === 'undefined') return;
+        const lat = Number(element.dataset.lat);
+        const lng = Number(element.dataset.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+            element.textContent = 'The saved location coordinates are invalid.';
+            return;
+        }
+        const map = L.map(element, { scrollWheelZoom: false }).setView([lat, lng], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        L.marker([lat, lng]).addTo(map).bindPopup('Your reported location');
+    });
+    </script>
+</body>
+</html>

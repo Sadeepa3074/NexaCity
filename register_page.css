@@ -1,0 +1,51 @@
+/* Registration-only adjustments. The Sign In page's unified_auth.css remains unchanged. */
+.register-side {
+    align-items: center;
+    padding-top: 28px;
+    padding-bottom: 28px;
+}
+
+.register-card {
+    width: min(100%, 450px);
+}
+
+.register-card .login-heading p {
+    margin-bottom: 23px;
+}
+
+.register-form input {
+    margin-bottom: 17px;
+}
+
+.register-form button {
+    margin-top: 4px;
+}
+
+.register-card .register-hint {
+    margin-top: 23px;
+}
+
+@media (max-width: 850px) {
+    .register-side {
+        min-height: 100vh;
+        padding: 32px 20px;
+    }
+
+    .register-card .mobile-brand {
+        margin-bottom: 34px;
+    }
+}
+
+@media (max-width: 520px) {
+    .register-side {
+        padding: 26px 18px;
+    }
+
+    .register-card .login-heading h2 {
+        font-size: 30px;
+    }
+
+    .register-form input {
+        margin-bottom: 15px;
+    }
+}
