@@ -1,0 +1,86 @@
+<div class="cf-drawer-inner" data-report-id="{{ report.complaint_id }}">
+  <header class="cf-drawer-header">
+    <div class="cf-drawer-heading">
+      <div class="cf-drawer-eyebrow">REPORT DETAIL</div>
+      <div class="cf-drawer-reference" id="cf-drawer-label">{{ report.reference_code }}</div>
+      <div class="cf-drawer-header-meta">Submitted {{ report.created_at.strftime('%d %b %Y · %I:%M %p') }}</div>
+    </div>
+    <button type="button" class="cf-drawer-close" data-cf-drawer-close aria-label="Close report details">×</button>
+  </header>
+
+  <div class="cf-drawer-scroll">
+    <div class="cf-drawer-badges">
+      <span class="status-pill status-{{ report.status | lower | replace(' ', '-') }}">{{ report.status }}</span>
+      <span class="cf-severity severity-{{ report.severity | lower }}">{{ report.severity }} severity</span>
+    </div>
+    <h2 class="cf-drawer-title">{{ report.category_name or 'Community issue' }}</h2>
+    <p class="cf-drawer-description">{{ report.description }}</p>
+
+    <div class="cf-drawer-meta">
+      <div><span>Reported by</span><strong>{{ report.citizen_name }}</strong></div>
+      <div><span>Area</span><strong>{{ report.area_name or report.address_text }}</strong></div>
+    </div>
+
+    <section class="cf-drawer-section cf-location-section" aria-labelledby="cf-location-title">
+      <h3 id="cf-location-title">Reported location</h3>
+      <p class="cf-drawer-muted">{{ report.address_text }}{% if report.area_name %} · {{ report.area_name }}{% endif %}</p>
+      {% if report.latitude is not none and report.longitude is not none %}
+      <div class="cf-drawer-map" data-lat="{{ report.latitude }}" data-lng="{{ report.longitude }}" role="region" aria-label="Map of the reported location"></div>
+      {% else %}
+      <div class="cf-drawer-map-empty">Map coordinates were not provided for this complaint.</div>
+      {% endif %}
+      {% if report.image_path %}
+      <a class="cf-drawer-photo-link" href="{{ url_for('admin.report_photo', complaint_id=report.complaint_id) }}"
+         target="_blank" rel="noopener noreferrer">
+        <img src="{{ url_for('admin.report_photo', complaint_id=report.complaint_id) }}"
+             alt="Photograph submitted with the complaint" loading="lazy">
+        <span>Open attached photograph ↗</span>
+      </a>
+      {% endif %}
+    </section>
+
+    {% include 'admin_ai_panel.html' %}
+
+    {% include 'admin_duplicates_panel.html' %}
+
+    {% include 'admin_priority_panel.html' %}
+
+    {% include 'admin_report_actions.html' %}
+
+    <section class="cf-drawer-section" aria-labelledby="cf-activity-title">
+      <h3 id="cf-activity-title">Activity history</h3>
+      <div class="cf-timeline">
+        {% for event in history %}
+        <div class="cf-timeline-entry">
+          <span class="cf-timeline-dot" aria-hidden="true"></span>
+          <strong>{{ event.new_status }}</strong>
+          <time>{{ event.changed_at.strftime('%d %b %Y · %I:%M %p') }}</time>
+          {% if event.note %}<p>{{ event.note }}</p>{% endif %}
+          {% if event.changed_by_name %}<small>By {{ event.changed_by_name }}</small>{% endif %}
+        </div>
+        {% else %}
+        <p class="cf-drawer-muted">No status updates recorded yet.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    {% if assignment_history %}
+    <section class="cf-drawer-section" aria-labelledby="cf-assignment-history-title">
+      <h3 id="cf-assignment-history-title">Team assignment history</h3>
+      {% for item in assignment_history %}
+      <div class="cf-assignment-history">
+        <strong>{{ item.team_name }}</strong>
+        <time>{{ item.assigned_at.strftime('%d %b %Y · %I:%M %p') }}</time>
+        <span>{% if item.ended_at %}Ended{% else %}Current{% endif %}</span>
+        {% if item.note %}<p>{{ item.note }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+  </div>
+
+  <footer class="cf-drawer-footer">
+    <button type="button" data-cf-drawer-close class="cf-secondary-action">Close</button>
+    <a href="{{ url_for('admin.report_detail', complaint_id=report.complaint_id) }}" class="cf-full-page-link">Open full details ↗</a>
+  </footer>
+</div>

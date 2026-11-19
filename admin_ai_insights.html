@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Insights & Evaluation | NexaCity</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_drawer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_analytics.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_management.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_ai_insights.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/civicfix_palette.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nexacity_premium.css') }}">
+</head>
+<body>
+<!-- Small, local SVG icon set; no icon framework required. -->
+<svg aria-hidden="true" class="svg-definitions" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v6h5M9 13h7M9 17h7"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15m6-12v15"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V11m5 9V5m5 15v-8m5 8V8M2 21h20"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 20v-2a7 7 0 0 1 14 0v2M17 5a3 3 0 0 1 0 6m1 3a5 5 0 0 1 4 5v1"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="18" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="m8 13 2 2 5-5M8 18h8"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 20 6v6c0 5-3 8-8 10-5-2-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 4H5v16h4m6-4 4-4-4-4m-9 4h13"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m12 3 10 18H2zM12 9v5m0 3v.2"/></symbol>
+</svg>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="brand-row">
+      <div class="brand-mark"><img src="{{ url_for('static', filename='images/nexacity-symbol-transparent.png') }}" alt="" aria-hidden="true"></div>
+      <div><div class="brand-title">NexaCity</div><div class="brand-subtitle">MUNICIPAL SERVICES</div></div>
+    </div>
+
+    <div class="workspace-note">
+      <svg class="icon"><use href="#i-shield"></use></svg>
+      <div><strong>Authority workspace</strong><span>Administration workspace · Report management</span></div>
+    </div>
+
+    <div class="sidebar-label">WORKSPACE</div>
+    <nav class="sidebar-nav" aria-label="Administration navigation">
+      <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+        <svg class="icon"><use href="#i-grid"></use></svg>Overview
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.reports') }}">
+        <svg class="icon"><use href="#i-file"></use></svg>Reports
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.map_hotspots') }}">
+        <svg class="icon"><use href="#i-map"></use></svg>Map &amp; hotspots
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.analytics') }}">
+        <svg class="icon"><use href="#i-chart"></use></svg>Analytics
+      </a>
+      <a class="nav-link active" href="{{ url_for('admin.ai_insights') }}" aria-current="page">
+        <svg class="icon"><use href="#i-spark"></use></svg>AI insights
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.teams') }}">
+        <svg class="icon"><use href="#i-users"></use></svg>Teams
+      </a>
+    </nav>
+
+    <div class="sidebar-label manage-label">MANAGE</div>
+    <nav class="sidebar-nav" aria-label="Administration tools">
+      <a class="nav-link" href="{{ url_for('admin.audit_log') }}">
+        <svg class="icon"><use href="#i-clipboard"></use></svg>Audit log
+      </a>
+      <a class="nav-link" href="{{ url_for('admin.settings') }}">
+        <svg class="icon"><use href="#i-settings"></use></svg>Settings
+      </a>
+    </nav>
+    <div class="sidebar-bottom">
+      <form action="{{ url_for('admin.logout') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="sidebar-logout"><svg class="icon"><use href="#i-logout"></use></svg>Sign out</button>
+      </form>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-heading"><h1>AI Insights</h1><p>Inspect measured model results and human-reviewed triage activity.</p></div>
+      <div class="topbar-actions">
+        <a class="citizen-button" href="{{ url_for('home') }}">Public website <svg class="icon"><use href="#i-arrow"></use></svg></a>
+        <span class="admin-avatar" aria-label="Signed in as {{ user.full_name }}">{{ user.full_name[:2] | upper }}</span>
+      </div>
+    </header>
+
+    <main class="admin-content aii-content">
+      <section class="aii-titlebar">
+        <div>
+          <p class="aii-eyebrow">NEXACITY · SERVICE INTELLIGENCE</p>
+          <h2>AI insights &amp; evaluation</h2>
+          <p>A clear view of category suggestions, similar reports and priority reviews.</p>
+        </div>
+      </section>
+
+      {% if db_error %}
+        <div class="aii-notice error" role="alert">AI review information is temporarily unavailable. Refresh the page or contact your system administrator if the issue continues.</div>
+      {% endif %}
+
+      {% if model.state == 'not_trained' %}
+        <div class="aii-notice" role="status">Category suggestions are not currently available. Report review, similar-report checks and priority assessments remain available.</div>
+      {% elif model.state == 'unavailable' %}
+        <div class="aii-notice error" role="alert">Category suggestions are temporarily unavailable. Other report review tools remain available.</div>
+      {% elif model.inference_unavailable is defined %}
+        <div class="aii-notice error" role="alert">The category review queue is temporarily unavailable. You can continue reviewing reports and recorded decisions.</div>
+      {% endif %}
+
+      <section class="aii-hero">
+        <div class="aii-hero-main">
+          <span class="aii-overline">MODEL STATUS</span>
+          <div class="aii-hero-title"><h3>Category suggestion model</h3>
+            {% if model.state == 'ready' %}
+              <span class="aii-pill {{ 'aii-demo' if model.is_demo else 'aii-verified' }}">{{ 'Initial model' if model.is_demo else 'Officer-reviewed model' }}</span>
+            {% else %}<span class="aii-pill aii-muted">Not active</span>{% endif %}
+          </div>
+          <p>Category suggestions support the review process. Administrators confirm all categories and decide what action to take.</p>
+          {% if model.state != 'ready' %}<p class="aii-lightnote">Model evaluation details appear here when an evaluation is available.</p>{% endif %}
+        </div>
+        <div class="aii-hero-aside">
+          <span class="aii-overline">EVALUATION</span>
+          {% if model.state == 'ready' and model.is_demo %}
+            <strong>Initial evaluation</strong>
+            <p>The model is using example descriptions while it is being set up. Performance on real citizen reports has not yet been established.</p>
+          {% elif model.state == 'ready' %}
+            <strong>Officer-reviewed evaluation</strong>
+            <p>Results are based on previously confirmed examples and may change as more reports are reviewed.</p>
+          {% else %}
+            <strong>Evaluation unavailable</strong>
+            <p>Evaluation details will appear when category suggestions are available.</p>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="aii-kpis" aria-label="AI evaluation summary">
+        {% if model.state == 'ready' and not model.is_demo %}
+        <article class="aii-kpi"><span>EVALUATION ACCURACY</span>
+          <strong>{% if model.accuracy is not none %}{{ model.accuracy }}<small>%</small>{% else %}—{% endif %}</strong>
+          <p>Correct category suggestions across the available reviewed evaluation examples.</p>
+        </article>
+        <article class="aii-kpi"><span>CATEGORY F1 SCORE</span>
+          <strong>{% if model.macro_f1 is not none %}{{ model.macro_f1 }}<small>%</small>{% else %}—{% endif %}</strong>
+          <p>Average category-level evaluation score; not a confidence rating for an individual report.</p>
+        </article>
+        {% elif model.state == 'ready' and model.is_demo %}
+        <article class="aii-kpi"><span>MODEL EVALUATION</span><strong>Early stage</strong><p>Evaluation on real citizen reports is not yet available.</p></article>
+        {% else %}
+        <article class="aii-kpi"><span>MODEL EVALUATION</span><strong>Not available</strong><p>Category evaluation will appear when reviewed examples are available.</p></article>
+        {% endif %}
+        <article class="aii-kpi"><span>OFFICER-VERIFIED LABELS</span>
+          <strong>{% if op is not none %}{{ op.verified_labels }}{% else %}—{% endif %}</strong>
+          <p>{% if op is not none and op.label_coverage is not none %}{{ op.label_coverage }}% of {{ op.total_reports }} reports have an administrator-confirmed category.{% else %}Coverage unavailable.{% endif %}</p>
+        </article>
+        <article class="aii-kpi"><span>PRIORITY REVIEW AGREEMENT</span>
+          <strong>{% if op is not none and op.priority_agreement_rate is not none %}{{ op.priority_agreement_rate }}<small>%</small>{% else %}—{% endif %}</strong>
+          <p>{% if op is not none %}{{ op.priority_agreements }} matching recommendations across {{ op.priority_reviews }} saved reviews. This is agreement, not accuracy.{% else %}No data available.{% endif %}</p>
+        </article>
+      </section>
+
+      <section class="aii-two" aria-label="Classifier quality and label coverage">
+        <article class="aii-card">
+          <div class="aii-card-head"><div><h3>Category evaluation</h3><p>How category suggestions compare with administrator-confirmed examples</p></div><span class="aii-mini-tag">EVALUATION</span></div>
+          {% if model.state == 'ready' and not model.is_demo and model.class_metrics %}
+            <div class="aii-table-scroll"><table class="aii-table">
+              <thead><tr><th>Category</th><th>Precision</th><th>Recall</th><th>F1</th><th>Tests</th></tr></thead>
+              <tbody>{% for item in model.class_metrics %}
+                <tr><td><strong>{{ item.category }}</strong></td><td>{{ item.precision }}%</td><td>{{ item.recall }}%</td><td>{{ item.f1 }}%</td><td>{{ item.support }}</td></tr>
+              {% endfor %}</tbody>
+            </table></div>
+          {% elif model.state == 'ready' and model.is_demo %}
+            <div class="aii-empty">Category-level performance will appear after enough real reports have been reviewed.</div>
+          {% elif model.state == 'ready' %}
+            <div class="aii-empty">Category-level evaluation details are not available for the current model version.</div>
+          {% else %}<div class="aii-empty">Category-level evaluation will appear when sufficient reviewed examples are available.</div>{% endif %}
+          <p class="aii-small">Evaluation results can vary when the number or variety of reviewed examples is limited.</p>
+        </article>
+        <article class="aii-card">
+          <div class="aii-card-head"><div><h3>Verified category coverage</h3><p>Categories confirmed by administrators</p></div></div>
+          {% if op is not none and op.verified_categories %}
+            <div class="aii-bars">
+            {% for item in op.verified_categories %}
+              <div class="aii-baritem"><div class="aii-bar-caption"><strong>{{ item.name }}</strong><span>{{ item.amount }} labels</span></div>
+                <div class="aii-track"><div class="aii-fill" data-cf-fill="{{ (100 * item.amount / op.verified_labels) | round(1) if op.verified_labels else 0 }}"></div></div>
+              </div>
+            {% endfor %}
+            </div>
+          {% elif op is none %}<div class="aii-empty">Cannot read verified labels right now.</div>
+          {% else %}<div class="aii-empty">No administrator-confirmed categories have been recorded yet. Confirm a category while reviewing a report.</div>{% endif %}
+          <p class="aii-small">Confirmed categories are recorded separately and do not change the citizen's original submission.</p>
+        </article>
+      </section>
+
+      <section class="aii-two" aria-label="Reviews overview">
+        <article class="aii-card">
+          <div class="aii-card-head"><div><h3>Duplicate review outcomes</h3><p>What administrators decided after reviewing possible nearby matches</p></div></div>
+          {% if op is not none %}
+            <div class="aii-dups">
+              <div><span>Same issue</span><strong>{{ op.duplicate_same }}</strong></div>
+              <div><span>Different issues</span><strong>{{ op.duplicate_different }}</strong></div>
+              <div><span>Pairs reviewed</span><strong>{{ op.duplicate_reviews }}</strong></div>
+            </div>
+          {% else %}<div class="aii-empty">Duplicate review records unavailable.</div>{% endif %}
+          <p class="aii-small">These figures summarise administrator decisions on reviewed pairs; they are not a measure of automatic matching accuracy.</p>
+        </article>
+        <article class="aii-card">
+          <div class="aii-card-head"><div><h3>Final priority choices</h3><p>Officer selections, independently recorded from our rule-based suggestions</p></div></div>
+          {% if op is not none and op.priority_reviews %}
+            <div class="aii-bars">
+              {% for item in priority_levels %}
+                <div class="aii-baritem"><div class="aii-bar-caption"><strong>{{ item.level }}</strong><span>{{ item.amount }} reviews</span></div>
+                  <div class="aii-track"><div class="aii-fill aii-level-{{ item.level | lower }}" data-cf-fill="{{ (100 * item.amount / op.priority_reviews) | round(1) }}"></div></div>
+                </div>
+              {% endfor %}
+            </div>
+          {% elif op is none %}<div class="aii-empty">Priority review records unavailable.</div>
+          {% else %}<div class="aii-empty">No officer priority reviews recorded yet.</div>{% endif %}
+          <p class="aii-small">Priority guidance is based on recorded report details and is not an emergency risk assessment.</p>
+        </article>
+      </section>
+
+      <section class="aii-card aii-queue" aria-label="Category mismatch review queue">
+        <div class="aii-card-head aii-queuehead">
+          <div><h3>Category mismatch review queue</h3><p>Recent unresolved reports where the citizen's category differs from the model's suggestion</p></div>
+          {% if model.state == 'ready' and not db_error and predictions is not none %}
+            <a class="aii-export" href="{{ url_for('admin.ai_insights_export') }}">Export review CSV</a>
+          {% endif %}
+        </div>
+        {% if predictions is not none %}
+          <div class="aii-queue-info">
+            <span><strong>{{ predictions.sample_size }}</strong> recent active report(s) examined (maximum 120)</span>
+            <span><strong>{{ predictions.compared }}</strong> had a citizen-selected category</span>
+            <span><strong>{{ predictions.mismatching }}</strong> mismatches found</span>
+            <span><strong>{{ predictions.low_estimate }}</strong> predictions below 50% model estimate</span>
+          </div>
+          <p class="aii-small aii-inset">This queue highlights recent reports where the selected and suggested categories differ. A difference does not, by itself, mean either category is incorrect.</p>
+          {% if predictions.queue %}
+            <div class="aii-table-scroll"><table class="aii-table aii-queue-table">
+              <thead><tr><th>Report</th><th>Citizen selected</th><th>Model suggested</th><th>{% if model.is_demo %}Review signal{% else %}Model estimate{% endif %}</th><th>Action</th></tr></thead>
+              <tbody>{% for r in predictions.queue %}
+                <tr>
+                  <td><strong>{{ r.reference_code }}</strong><small>{{ r.area_name }} · {{ r.status }}</small></td>
+                  <td>{{ r.citizen_category }}</td><td><strong>{{ r.ai_category }}</strong></td>
+                  <td>{% if model.is_demo %}—<small>Review required</small>{% else %}{{ r.estimate }}%<small>Guidance only</small>{% endif %}</td>
+                  <td><a class="aii-review-link" href="{{ url_for('admin.report_detail', complaint_id=r.complaint_id) }}">Review report →</a></td>
+                </tr>
+              {% endfor %}</tbody></table></div>
+            <p class="aii-small">Showing up to 12 mismatches. Use Export CSV to review the full result set.</p>
+          {% else %}<div class="aii-empty">No category differences were found among the recent active reports reviewed.</div>{% endif %}
+        {% elif model.state == 'ready' and not db_error %}
+          <div class="aii-empty">Category suggestions are temporarily unavailable. You can continue reviewing the reports.</div>
+        {% else %}<div class="aii-empty">The review queue will appear when category suggestions are available.</div>{% endif %}
+      </section>
+
+      {% if model.state == 'ready' and not model.is_demo and model.confusion_matrix %}
+      <section class="aii-card" aria-label="Category evaluation matrix">
+        <div class="aii-card-head"><div><h3>Category evaluation matrix</h3><p>Compare administrator-confirmed categories with the model suggestions.</p></div></div>
+        <div class="aii-table-scroll"><table class="aii-table aii-matrix"><thead>
+          <tr><th scope="col">Actual \ Predicted</th>{% for name in model.labels_order %}<th scope="col">{{ name }}</th>{% endfor %}</tr>
+        </thead><tbody>
+          {% for row in model.confusion_matrix %}
+          {% set ri = loop.index0 %}
+          <tr><th scope="row">{{ model.labels_order[ri] }}</th>
+            {% for count in row %}<td class="{{ 'aii-diagonal' if loop.index0 == ri else '' }}">{{ count }}</td>{% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody></table></div>
+        <p class="aii-small">This matrix summarises the available reviewed examples.</p>
+      </section>
+      {% endif %}
+
+      <div class="aii-disclosure"><strong>Using these insights:</strong> Category suggestions, similar-report matches and priority guidance are decision-support tools. Administrators review the evidence and confirm every category, match and action. No report is automatically changed, merged or assigned to a field crew.</div>
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/admin_ai_insights.js') }}"></script>
+</body>
+</html>

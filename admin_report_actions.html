@@ -1,0 +1,146 @@
+{% set workflow_steps = ['Submitted', 'Under Review', 'Assigned', 'In Progress', 'Resolved'] %}
+{% set current_step = workflow_steps.index(report.status) if report.status in workflow_steps else -1 %}
+{% set drawer_mode = request.args.get('drawer') == '1' %}
+
+<section class="cf-workflow-overview" aria-labelledby="cf-workflow-title">
+    <div class="cf-workflow-overview-head">
+        <div>
+            <span class="cf-workflow-eyebrow">COMPLAINT LIFECYCLE</span>
+            <h3 id="cf-workflow-title">Manage this report from review to resolution</h3>
+            <p>Each update is recorded in the report activity history and shared with the citizen.</p>
+        </div>
+        <span class="cf-workflow-current">Current: {{ report.status }}</span>
+    </div>
+    <ol class="cf-workflow-steps" aria-label="Complaint workflow">
+        {% for step in workflow_steps %}
+            <li class="{% if current_step >= 0 and loop.index0 < current_step %}is-complete{% elif loop.index0 == current_step %}is-current{% else %}is-upcoming{% endif %}">
+                <span class="cf-workflow-step-number">{% if current_step >= 0 and loop.index0 < current_step %}✓{% else %}{{ loop.index }}{% endif %}</span>
+                <span class="cf-workflow-step-label">{{ step }}</span>
+            </li>
+        {% endfor %}
+    </ol>
+    {% if report.status == 'Rejected' %}
+        <p class="cf-workflow-state cf-workflow-state-warning">This report is rejected. An administrator can move it back to Under Review if further action is required.</p>
+    {% elif report.status == 'Resolved' %}
+        <p class="cf-workflow-state cf-workflow-state-success">This report is marked as resolved. Its current team assignment, if any, has been closed.</p>
+    {% elif report.status == 'Under Review' %}
+        <p class="cf-workflow-state">Next recommended action: assign an active maintenance team. The assignment action will automatically change the status to <strong>Assigned</strong>.</p>
+    {% elif report.status == 'Submitted' %}
+        <p class="cf-workflow-state">Next recommended action: review the report and move it to <strong>Under Review</strong>. Team assignment becomes available after that.</p>
+    {% elif report.status == 'Assigned' %}
+        <p class="cf-workflow-state">The team has been assigned. When work begins, update the status to <strong>In Progress</strong>.</p>
+    {% elif report.status == 'In Progress' %}
+        <p class="cf-workflow-state">When the reported issue has been addressed, choose <strong>Resolved — mark as done</strong> and add a completion note for the citizen.</p>
+    {% endif %}
+</section>
+
+<section class="cf-workflow-management" aria-label="Complaint assignment and status controls">
+    <article class="cf-workflow-card cf-workflow-status-card">
+        <div class="cf-workflow-card-heading">
+            <span class="cf-workflow-card-icon">01</span>
+            <div><h4>Update complaint status</h4><p>Choose the next allowed stage and explain the update.</p></div>
+        </div>
+        {% if allowed_next %}
+            <form class="cf-workflow-form" method="POST"
+                  action="{{ url_for('admin.update_report_status', complaint_id=report.complaint_id) }}"
+                  {% if drawer_mode %}data-cf-async-form{% endif %}>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label for="cf-workflow-status-{{ report.complaint_id }}">Next status</label>
+                <select id="cf-workflow-status-{{ report.complaint_id }}" name="new_status" required>
+                    <option value="">Choose the next status</option>
+                    {% for option in allowed_next %}
+                        <option value="{{ option }}">
+                            {% if option == 'Under Review' %}Under Review — return to review
+                            {% elif option == 'In Progress' %}In Progress — work has started
+                            {% elif option == 'Resolved' %}Resolved — mark as done
+                            {% elif option == 'Rejected' %}Rejected — close with a reason
+                            {% else %}{{ option }}{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+                <label for="cf-workflow-note-{{ report.complaint_id }}">Update note for the citizen</label>
+                <textarea id="cf-workflow-note-{{ report.complaint_id }}" name="note" rows="4" minlength="5" maxlength="500" required
+                    placeholder="{% if report.status == 'In Progress' %}Describe the work completed and why the issue can be marked as resolved.{% elif report.status == 'Submitted' %}Explain that the report is being reviewed.{% elif report.status == 'Rejected' %}Explain why the report is being reopened for review.{% else %}Explain the action taken or why the report status is changing.{% endif %}"></textarea>
+                <button class="cf-workflow-button cf-workflow-button-primary" type="submit">
+                    {% if report.status == 'Submitted' %}Move to Under Review
+                    {% elif report.status == 'Assigned' %}Update work status
+                    {% elif report.status == 'In Progress' %}Save status / resolution
+                    {% elif report.status == 'Rejected' %}Reopen for review
+                    {% elif report.status == 'Under Review' %}Save rejection decision
+                    {% else %}Save status update{% endif %}
+                </button>
+            </form>
+        {% elif report.status == 'Resolved' %}
+            <div class="cf-workflow-terminal cf-workflow-terminal-success"><strong>Completed</strong><span>No further status changes are available for this resolved report.</span></div>
+        {% else %}
+            <div class="cf-workflow-terminal"><strong>No status action available</strong><span>This report is currently closed.</span></div>
+        {% endif %}
+        <p class="cf-workflow-card-hint">A status change requires a note of 5–500 characters. The note appears in the citizen's complaint timeline.</p>
+    </article>
+
+    <article class="cf-workflow-card cf-workflow-assignment-card">
+        <div class="cf-workflow-card-heading">
+            <span class="cf-workflow-card-icon">02</span>
+            <div><h4>Maintenance team</h4><p>Assign or reassign the team responsible for the issue.</p></div>
+        </div>
+        {% if active_assignment %}
+            <div class="cf-workflow-current-team">
+                <span class="cf-workflow-team-dot" aria-hidden="true"></span>
+                <div><small>Currently assigned to</small><strong>{{ active_assignment.team_name }}</strong></div>
+                <span class="cf-workflow-assigned-tag">Active</span>
+            </div>
+            <p class="cf-workflow-team-specialty">{{ active_assignment.specialty }} · Assigned {{ active_assignment.assigned_at.strftime('%d %b %Y') }}</p>
+        {% else %}
+            <div class="cf-workflow-no-team">No maintenance team is currently assigned to this report.</div>
+        {% endif %}
+
+        {% if can_assign and available_teams and (not active_assignment or available_teams|length > 1) %}
+            <form class="cf-workflow-form" method="POST"
+                  action="{{ url_for('admin.assign_report', complaint_id=report.complaint_id) }}"
+                  {% if drawer_mode %}data-cf-async-form{% endif %}>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label for="cf-workflow-team-{{ report.complaint_id }}">Select an active team</label>
+                <select id="cf-workflow-team-{{ report.complaint_id }}" name="team_id" required>
+                    <option value="">Choose a team</option>
+                    {% for team in available_teams %}
+                        {% if active_assignment and active_assignment.team_id == team.team_id %}
+                            <option value="" disabled>{{ team.team_name }} — current team</option>
+                        {% else %}
+                            <option value="{{ team.team_id }}">{{ team.team_name }} · {{ team.specialty }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <label for="cf-workflow-team-note-{{ report.complaint_id }}">Assignment note for the citizen</label>
+                <textarea id="cf-workflow-team-note-{{ report.complaint_id }}" name="note" rows="3" minlength="5" maxlength="500" required
+                    placeholder="Explain which team will review or handle this issue."></textarea>
+                <button class="cf-workflow-button cf-workflow-button-accent" type="submit">
+                    {% if report.status == 'Under Review' %}Assign team &amp; set status to Assigned
+                    {% else %}Save team reassignment{% endif %}
+                </button>
+            </form>
+        {% elif can_assign and active_assignment and available_teams and available_teams|length == 1 %}
+            <div class="cf-workflow-empty-team-callout">
+                <strong>The current team is the only active team</strong>
+                <p>To reassign this report, create another active team first.</p>
+                <a href="{{ url_for('admin.new_team') }}">Add another team <span aria-hidden="true">→</span></a>
+            </div>
+        {% elif report.status == 'Under Review' %}
+            <div class="cf-workflow-empty-team-callout">
+                <strong>No active maintenance teams available</strong>
+                <p>Create an active team before assigning this report. The new team will appear here automatically.</p>
+                <a href="{{ url_for('admin.new_team') }}">Create the first team <span aria-hidden="true">→</span></a>
+            </div>
+        {% elif report.status == 'Submitted' %}
+            <div class="cf-workflow-gate-note">Move this report to <strong>Under Review</strong> first. The team assignment option will then become available. You can prepare an active team on the <a href="{{ url_for('admin.teams') }}">Teams page</a>.</div>
+        {% elif report.status in ('Resolved', 'Rejected') %}
+            <div class="cf-workflow-gate-note">This report is closed. Reopen it to <strong>Under Review</strong> before assigning or reassigning a team.</div>
+        {% else %}
+            <div class="cf-workflow-empty-team-callout">
+                <strong>No active teams available</strong>
+                <p>Create an active team before assigning or reassigning this report.</p>
+                <a href="{{ url_for('admin.new_team') }}">Manage maintenance teams <span aria-hidden="true">→</span></a>
+            </div>
+        {% endif %}
+        <p class="cf-workflow-card-hint">Assigning a team while the report is Under Review changes its status to Assigned and records the assignment in the activity history. The assignment does not notify or dispatch external field workers.</p>
+    </article>
+</section>
